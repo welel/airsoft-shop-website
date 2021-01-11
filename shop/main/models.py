@@ -5,6 +5,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.urls import reverse
 
+from mptt.models import MPTTModel, TreeForeignKey
+
 
 
 User = get_user_model()
@@ -15,10 +17,18 @@ def get_product_url(obj, viewname, model_name):
     return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
 
 
-class Category(models.Model):
+class Category(MPTTModel):
 
-    name = models.CharField(max_length=200, verbose_name='Название категории')
+    parent = TreeForeignKey('self', null=True, blank=True, 
+            related_name='children', on_delete=models.CASCADE
+    )
+    name = models.CharField(max_length=200, unique=True,
+            verbose_name='Category name'
+    )
     slug = models.SlugField(unique=True)
+    
+    class MPTTMeta:
+        order_insertion_by = ['name']
     
     def __str__(self):
         return self.name
@@ -54,9 +64,6 @@ class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
             verbose_name='Category'
     )
-    # type_ = models.ForeignKey(Type, on_delete=models.CASCADE,
-            # verbose_name='Type'
-    # )
                       
     class Meta:
         abstract = True
@@ -113,50 +120,51 @@ class AccessoryItem(Item):
 class CartItem(models.Model):
 
     user = models.ForeignKey('Customer', on_delete=models.CASCADE,
-                                verbose_name='Покупатель')
+            verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
-            verbose_name='Корзина', related_name='related_item'
+            related_name='related_item', verbose_name='Cart'
     )
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    qty = models.PositiveIntegerField(default=1, verbose_name='Количество')
+    quantity = models.PositiveIntegerField(default=1, verbose_name='Quantity')
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-            verbose_name='Общая цена'
+            verbose_name='Total price'
     )
-                                    
+      
     def __str__(self):
-        return 'Продукт: {} (для корзины)'.format(self.item.title)
+        return 'Item: {} (for cart)'.format(self.item.title)
 
 
 class Cart(models.Model):
 
     owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
-            verbose_name='Владелец'
+            verbose_name='Owner'
     )
     items = models.ManyToManyField(CartItem, blank=True,
-            related_name='related_cart'
+            related_name='related_cart', verbose_name='Items'
     )
-    total_items = models.PositiveIntegerField(default=0)
+    total_items = models.PositiveIntegerField(default=0,
+            verbose_name='Total items'
+    )
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-            verbose_name='Общая цена'
+            verbose_name='Total price'
     )
                                     
     def __str__(self):
-        return 'Корзина: {}'.format(self.id)
+        return 'Cart: {}'.format(self.id)
 
 
 class Customer(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-            verbose_name='Пользователь'
+            verbose_name='User'
     )
-    phone = models.CharField(max_length=20, verbose_name='Номер телефона')
-    address = models.CharField(max_length=255, verbose_name='Адрес')
+    phone = models.CharField(max_length=20, verbose_name='Phone')
+    address = models.CharField(max_length=255, verbose_name='Address')
     
     def __str__(self):
-        return 'Пользователь: {} {}'.format(
-            self.user.first_name, self.user.last_name)
+        return 'User: {} {}'.format(self.user.first_name, self.user.last_name)
 
 
 goodses = [GunItem, AmmoItem, GearItem, AccessoryItem]
