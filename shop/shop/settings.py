@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'mptt',
+    'django_better_admin_arrayfield',
     
     'main.apps.MainConfig',
 ]

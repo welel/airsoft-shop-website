@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey
+from django_better_admin_arrayfield.models.fields import ArrayField
 
 
 
@@ -48,7 +48,8 @@ class Item(models.Model):
             verbose_name='Price'
     )
     sku = models.CharField(max_length=16, unique=True, blank=True,
-            verbose_name='Stock Keeping Unit')
+            verbose_name='Stock Keeping Unit'
+    )
     features = ArrayField(models.CharField(max_length=150), blank=True,
             null=True, verbose_name='Features'
     )
@@ -85,6 +86,7 @@ class GunItem(Item):
             verbose_name='Magazine capacity'
     )
     
+    category_parent = 'Airsoft Guns'
     class Meta:
         verbose_name = 'Gun'
         verbose_name_plural = 'Guns'
@@ -99,19 +101,22 @@ class AmmoItem(Item):
     diameter = models.DecimalField(max_digits=5, decimal_places=2, 
             verbose_name='Diameter'
     )
-
+    
+    category_parent = 'BBS & Pellets'
     class Meta:
         verbose_name = 'Ammunition'
 
 
 class GearItem(Item):
     
+    category_parent = 'Tactical Gear'
     class Meta:
         verbose_name = 'Tactial gear'
 
 
 class AccessoryItem(Item):
 
+    category_parent = 'Accessories'
     class Meta:
         verbose_name = 'Accessory'
         verbose_name_plural = 'Accessories'

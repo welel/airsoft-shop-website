@@ -1,57 +1,34 @@
 from django.contrib import admin
 from django import forms
-from django.contrib.postgres.forms import SimpleArrayField
+
+from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
 from .models import *
+from .forms import GunItemForm, AmmoItemForm, GearItemForm, AccessoryItemForm
 
 
 
-# TODO: SimpleArrayField(forms.CharField(max_length=100))
-class GunAdmin(admin.ModelAdmin):  
-
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if (db_field.name == 'category' and 
-                Category.objects.filter(name='Airsoft Guns').exists()):
-            qsc = Category.objects.get(name='Airsoft Guns').get_children()
-            return forms.ModelChoiceField(qsc)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+class GunItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+    form = GunItemForm
 
 
-class AmmoAdmin(admin.ModelAdmin):  
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if (db_field.name == 'category' and 
-                Category.objects.filter(name='BBS & Pellets').exists()):
-            qsc = Category.objects.get(name='BBS & Pellets').get_children()
-            return forms.ModelChoiceField(qsc)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+class AmmoItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+    form = AmmoItemForm
 
 
-class GearAdmin(admin.ModelAdmin):  
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if (db_field.name == 'category' and 
-                Category.objects.filter(name='Tactical Gear').exists()):
-            qsc = Category.objects.get(name='Tactical Gear').get_children()
-            return forms.ModelChoiceField(qsc)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+class GearItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+    form = GearItemForm
 
 
-class AccessoryAdmin(admin.ModelAdmin):  
-    
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        if (db_field.name == 'category' and 
-                Category.objects.filter(name='Accessories').exists()):
-            qsc = Category.objects.get(name='Accessories').get_children()
-            return forms.ModelChoiceField(qsc)
-        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+class AccessoryItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+    form = AccessoryItemForm    
 
 
 admin.site.register(Category)
-admin.site.register(GunItem, GunAdmin)
-admin.site.register(AmmoItem, AmmoAdmin)
-admin.site.register(GearItem, GearAdmin)
-admin.site.register(AccessoryItem, AccessoryAdmin)
+admin.site.register(GunItem, GunItemAdmin)
+admin.site.register(AmmoItem, AmmoItemAdmin)
+admin.site.register(GearItem, GearItemAdmin)
+admin.site.register(AccessoryItem, AccessoryItemAdmin)
 admin.site.register(CartItem)
 admin.site.register(Cart)
 admin.site.register(Customer)
