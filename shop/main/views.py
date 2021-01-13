@@ -1,11 +1,18 @@
 from django.shortcuts import render
-from .models import LatestItemManager, AmmoItem, GunItem
 from django.views.generic import DetailView
 
+from .models import Category, LatestItemManager, AmmoItem, GunItem
 
-def testv(request):
+
+
+def index(request):
+    categories = Category.objects.root_nodes()
     items = LatestItemManager.get_last_items()
-    return render(request, 'index.html', {'items': items})
+    return render(request, 'index.html', {
+                                            'items': items,
+                                            'categories': categories
+                                         }
+    )
     
     
 class ProductDetailView(DetailView):
