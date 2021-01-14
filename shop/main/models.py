@@ -39,19 +39,21 @@ class Item(models.Model):
     title = models.CharField(max_length=200, unique=True,
             verbose_name='Title')
     slug = models.SlugField(max_length=100, unique=True)
-    image = models.ImageField(default='ProductDefault.webp',
-            verbose_name='Image')
     description = models.TextField(max_length=2500,
             verbose_name='Description'
     )
     price = models.DecimalField(max_digits=9, decimal_places=2,
             verbose_name='Price'
     )
+    image = models.ImageField(default='ProductDefault.webp',
+                verbose_name='Image'
+    )
     sku = models.CharField(max_length=16, unique=True, blank=True,
             verbose_name='Stock Keeping Unit'
     )
-    features = ArrayField(models.CharField(max_length=150), blank=True,
-            null=True, verbose_name='Features'
+    features = ArrayField(models.CharField(max_length=150,
+            verbose_name='Feature'), blank=True, null=True,
+            verbose_name='Features'
     )
     color = models.CharField(max_length=50, blank=True,
             verbose_name='Color'
@@ -64,6 +66,9 @@ class Item(models.Model):
     )
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
             verbose_name='Category'
+    )
+    quantity_sold = models.PositiveIntegerField(default=0, 
+            verbose_name='Quantity sold'
     )
                       
     class Meta:

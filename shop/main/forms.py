@@ -15,7 +15,7 @@ class ItemForm(forms.ModelForm):
             self.fields['category'].queryset = cqs
         
     class Meta:
-        exclude=('added',)
+        exclude=('added', 'quantity_sold')
 
 
 GunItemForm = forms.modelform_factory(GunItem, form=ItemForm)
