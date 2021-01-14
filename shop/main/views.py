@@ -15,15 +15,18 @@ def index(request):
     )
     
     
-class ProductDetailView(DetailView):
+class ItemDetailView(DetailView):
     
-    CT_MODEL_MODEL_CLASS = {
-        'guns': GunItem,
-        'ammo': AmmoItem,
+    CATEGORY_MODEL = {
+        GunItem.category_parent: GunItem,
+        AmmoItem.category_parent: AmmoItem,
     }
     
     def dispatch(self, request, *args, **kwargs):
-        self.model = self.CT_MODEL_MODEL_CLASS[kwargs['ct_model']]
+        # TODO: OR 404
+        root_category = Category.objects.get(
+                name=kwargs['category']).get_root().name
+        self.model = self.CATEGORY_MODEL[root_category]
         self.queryset = self.model._base_manager.all()
         return super().dispatch(request, *args, **kwargs)
     

@@ -62,22 +62,25 @@
 		<h2>top sellers</h2>
 		<p>get a product on the next day</p>
 			<ul id="flexiselDemo3">
-			<!-- TODO -->
-				<div class="col-md-4">
-					<img src="{% static 'images/s3.jpg' %}" class="img-responsive" alt=""/> 
-					<div class="shop_desc"><a href="single.html">
-						</a><h3><a href="single.html"></a><a href="#">aliquam volutp</a></h3>
-						<p>Lorem ipsum consectetuer adipiscing </p>
-						<span class="reducedfrom">$66.00</span>
-						<span class="actual">$12.00</span><br>
-						<ul class="buttons">
-							<li class="cart"><a href="#">Add To Cart</a></li>
-							<li class="shop_btn"><a href="#">Read More</a></li>
-							<div class="clear"> </div>
-						</ul>
+				{% for item in items %}
+					<div class="col-md-4">
+						 
+						<div class="shop_desc">
+							<a href="{% url 'item_detail' category=item.category slug=item.slug %}">
+								<img src="{{ item.image.url }}" class="img-responsive" alt=""/>
+							</a>
+							<h3><a href="#"></a><a href="#">{{ item.category }}</a></h3>
+							<p>{{ item.title }}</p>
+							<span class="reducedfrom">$400</span>
+							<span class="actual">${{ item.price }}</span><br>
+							<ul class="buttons">
+								<li class="cart"><a href="#">Add To Cart</a></li>
+								<li class="shop_btn"><a href="#">Read More</a></li>
+								<div class="clear"> </div>
+							</ul>
+						</div>
 					</div>
-				</div>
-			
+				{% endfor %}
 			</ul>
 	<h3>SnowBoard Extreme Series</h3>
 		<script type="text/javascript">

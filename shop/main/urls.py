@@ -1,10 +1,10 @@
 from django.urls import path
-from .views import index, ProductDetailView
+from .views import index, ItemDetailView
 
 
 urlpatterns = [
     path('', index, name='index'),
-    path('products/<str:ct_model>/<str:slug>/', ProductDetailView.as_view(),
-            name='product_detail'
+    path('<str:category>/<str:slug>/', ItemDetailView.as_view(),
+            name='item_detail'
     ),
 ]
