@@ -1,7 +1,10 @@
-__pycache__
+__pycache__/
 *.pyc
 migrations/
-*.sqlite3
 *.ini
 env/
 .env
+dev_sources/
+.idea
+media/
+initial_data/
