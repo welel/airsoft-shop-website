@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+{% load mptt_tags %}
+
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block main %}
+
+<div class="container-fluid" style="background-color: #e7e7e7">
+	<div class="container-md pt-2">
+		<ul  class="list-inline fst-italic fw-bolder">
+			<li class="list-inline-item m-0">
+				<a href="{% static 'index' %}" class="text-dark text-decoration-none">Home</a>  >
+			</li>
+			{% for category in item.category.get_ancestors %}
+				<li class="list-inline-item m-0">
+					<a href="" class="text-dark text-decoration-none">{{category}}</a>  >
+				</li>
+			{% endfor %}
+			<li class="list-inline-item">
+				<a href="" class="text-decoration-none text-danger">{{item.category}}</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col">
+			<img src="{{item.image.url}}" class="img-fluid" />
+		</div>
+		<div class="col">
+			<h4>{{item.title}}</h4>
+			<hr/>
+			{% if item.sku %}
+				<p>SKU: {{item.sku}}</p>
+			{% endif %}
+			<h3 class="fw-bold">${{item.price}}</h3>
+			<table class="table">
+				<tbody>
+
+					<tr>
+						<td>Parameter</td><td>Argument</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
