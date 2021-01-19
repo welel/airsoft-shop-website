@@ -8,23 +8,20 @@ from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
 
 
-
 User = get_user_model()
 
 
-def get_product_url(obj, viewname, model_name):
+def get_product_url(obj, view_name):
     ct_model = obj.__class__.meta.model_name
-    return reverse(viewname, kwargs={'ct_model': ct_model, 'slug': obj.slug})
+    return reverse(view_name, kwargs={'ct_model': ct_model, 'slug': obj.slug})
 
 
 class Category(MPTTModel):
 
     parent = TreeForeignKey('self', null=True, blank=True, 
-            related_name='children', on_delete=models.CASCADE
-    )
+                            related_name='children', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, unique=True,
-            verbose_name='Category name'
-    )
+                            verbose_name='Category name')
     slug = models.SlugField(unique=True)
     
     class MPTTMeta:
@@ -37,39 +34,30 @@ class Category(MPTTModel):
 class Item(models.Model):
     
     title = models.CharField(max_length=200, unique=True,
-            verbose_name='Title')
+                             verbose_name='Title')
     slug = models.SlugField(max_length=100, unique=True)
     description = models.TextField(max_length=2500,
-            verbose_name='Description'
-    )
+                                   verbose_name='Description')
     price = models.DecimalField(max_digits=9, decimal_places=2,
-            verbose_name='Price'
-    )
+                                verbose_name='Price')
     image = models.ImageField(default='ProductDefault.webp',
-                verbose_name='Image'
-    )
+                              verbose_name='Image')
+    # TODO: Solve unique/null problem.
     sku = models.CharField(max_length=16, unique=True, blank=True,
-            verbose_name='Stock Keeping Unit'
-    )
+                           verbose_name='Stock Keeping Unit')
     features = ArrayField(models.CharField(max_length=150,
-            verbose_name='Feature'), blank=True, null=True,
-            verbose_name='Features'
-    )
+                          verbose_name='Feature'), blank=True, null=True,
+                          verbose_name='Features')
     color = models.CharField(max_length=50, blank=True,
-            verbose_name='Color'
-    )
+                             verbose_name='Color')
     weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True,
-            verbose_name='Weight'
-    )
+                                 verbose_name='Weight')
     added = models.DateField(auto_now_add=True, blank=True,
-            verbose_name='Date added'
-    )
+                             verbose_name='Date added')
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
-            verbose_name='Category'
-    )
-    quantity_sold = models.PositiveIntegerField(default=0, 
-            verbose_name='Quantity sold'
-    )
+                                 verbose_name='Category')
+    quantity_sold = models.PositiveIntegerField(default=0,
+                                                verbose_name='Quantity sold')
                       
     class Meta:
         abstract = True
@@ -81,17 +69,18 @@ class Item(models.Model):
 
 class GunItem(Item):
 
-    power_source = models.CharField(max_length=20, blank=True, 
-            verbose_name='Power source'
-    )
-    muzzle_velocity = models.PositiveIntegerField(blank=True, 
-            verbose_name='Muzzle velocity'
-    )
-    magazine_capacity = models.PositiveIntegerField(blank=True, 
-            verbose_name='Magazine capacity'
-    )
-    
     category_parent = 'Airsoft Guns'
+    power_source = models.CharField(max_length=20, blank=True, 
+                                    verbose_name='Power source')
+    muzzle_velocity = models.PositiveIntegerField(
+        blank=True,
+        verbose_name='Muzzle velocity'
+    )
+    magazine_capacity = models.PositiveIntegerField(
+        blank=True,
+        verbose_name='Magazine capacity'
+    )
+
     class Meta:
         verbose_name = 'Gun'
         verbose_name_plural = 'Guns'
@@ -102,12 +91,11 @@ class GunItem(Item):
 
 class AmmoItem(Item):
 
-    quantity =  models.PositiveIntegerField(verbose_name='Quantity')
-    diameter = models.DecimalField(max_digits=5, decimal_places=2, 
-            verbose_name='Diameter'
-    )
-    
     category_parent = 'BBS & Pellets'
+    quantity = models.PositiveIntegerField(verbose_name='Quantity')
+    diameter = models.DecimalField(max_digits=5, decimal_places=2, 
+                                   verbose_name='Diameter')
+
     class Meta:
         verbose_name = 'Ammunition'
 
@@ -115,6 +103,7 @@ class AmmoItem(Item):
 class GearItem(Item):
     
     category_parent = 'Tactical Gear'
+
     class Meta:
         verbose_name = 'Tactial gear'
 
@@ -122,6 +111,7 @@ class GearItem(Item):
 class AccessoryItem(Item):
 
     category_parent = 'Accessories'
+
     class Meta:
         verbose_name = 'Accessory'
         verbose_name_plural = 'Accessories'
@@ -130,17 +120,15 @@ class AccessoryItem(Item):
 class CartItem(models.Model):
 
     user = models.ForeignKey('Customer', on_delete=models.CASCADE,
-            verbose_name='Customer')
+                             verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
-            related_name='related_item', verbose_name='Cart'
-    )
+                             related_name='related_item', verbose_name='Cart')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
     quantity = models.PositiveIntegerField(default=1, verbose_name='Quantity')
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-            verbose_name='Total price'
-    )
+                                      verbose_name='Total price')
       
     def __str__(self):
         return 'Item: {} (for cart)'.format(self.item.title)
@@ -149,17 +137,14 @@ class CartItem(models.Model):
 class Cart(models.Model):
 
     owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
-            verbose_name='Owner'
-    )
+                              verbose_name='Owner')
     items = models.ManyToManyField(CartItem, blank=True,
-            related_name='related_cart', verbose_name='Items'
-    )
+                                   related_name='related_cart',
+                                   verbose_name='Items')
     total_items = models.PositiveIntegerField(default=0,
-            verbose_name='Total items'
-    )
+                                              verbose_name='Total items')
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-            verbose_name='Total price'
-    )
+                                      verbose_name='Total price')
                                     
     def __str__(self):
         return 'Cart: {}'.format(self.id)
@@ -168,8 +153,7 @@ class Cart(models.Model):
 class Customer(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-            verbose_name='User'
-    )
+                             verbose_name='User')
     phone = models.CharField(max_length=20, verbose_name='Phone')
     address = models.CharField(max_length=255, verbose_name='Address')
     
@@ -177,13 +161,14 @@ class Customer(models.Model):
         return 'User: {} {}'.format(self.user.first_name, self.user.last_name)
 
 
-goodses = [GunItem, AmmoItem, GearItem, AccessoryItem]
+ITEMS = [GunItem, AmmoItem, GearItem, AccessoryItem]
 
-class LatestItemManager():
-    
+
+class LatestItemManager:
+
     @staticmethod
     def get_last_items():
         items = []
-        for item_type in goodses:
+        for item_type in ITEMS:
             items.extend(item_type.objects.order_by('-id'))
         return items
