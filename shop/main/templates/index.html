@@ -4,4 +4,29 @@
 
 {% block main %}
 
+<div class="container-fluid p-0">
+	<img src="{% static 'img/poster.webp' %}" alt="poster" width="100%" />
+</div>
+
+<div class="content-top">
+	<h1 class="text-center"><b>Top sellers</b></h1>
+	<ul>
+		{% for item in items %}
+			<li class="box mt-3">
+				<div class="slide-img">
+					<img src="{{ item.image.url }}">
+				</div>
+				<div class="box-overlay">
+					<a href="#" class="buy-btn">Add to Card</a>
+				</div>
+				<div class="detail-box">
+					<a class="item-title" href="{% url 'item_detail' category=item.category slug=item.slug %}" class="item-title">{{ item.title }}</a>
+					<h1 class="item-price"><b>${{ item.price }}</b></h1>
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+</div>
+
+
 {% endblock %}
