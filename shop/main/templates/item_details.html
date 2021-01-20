@@ -17,11 +17,11 @@
 			</li>
 			{% for category in item.category.get_ancestors %}
 				<li class="list-inline-item m-0">
-					<a href="" class="text-dark text-decoration-none">{{category}}</a>  >
+					<a href="{% url 'items_category' category_slug=category.slug %}" class="text-dark text-decoration-none">{{category}}</a>  >
 				</li>
 			{% endfor %}
 			<li class="list-inline-item">
-				<a href="" class="text-decoration-none text-danger">{{item.category}}</a>
+				<a href="{% url 'items_category' category_slug=item.category.slug %}" class="text-decoration-none text-danger">{{item.category}}</a>
 			</li>
 		</ul>
 	</div>

@@ -23,6 +23,10 @@ class Category(MPTTModel):
     name = models.CharField(max_length=200, unique=True,
                             verbose_name='Category name')
     slug = models.SlugField(unique=True)
+    description = models.TextField(max_length=2500, null=True,  # TODO: null (temp for migrations)
+                                   verbose_name='Description')
+    image = models.ImageField(default='ProductDefault.webp',
+                              verbose_name='Image')
     
     class MPTTMeta:
         order_insertion_by = ['name']

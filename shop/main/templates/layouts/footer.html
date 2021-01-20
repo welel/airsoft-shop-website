@@ -6,7 +6,7 @@
             <h5 class="text-center text-secondary mt-2">Categories</h5>
             <ul class="list-unstyled text-center">
                 {% for category in categories %}
-                    <li class="mt-1"><a href="" class="text-white fw-bolder text-decoration-none">{{ category }}</a></li>
+                    <li class="mt-1"><a href="{% url 'items_category' category_slug=category.slug %}" class="text-white fw-bolder text-decoration-none">{{ category }}</a></li>
                 {% endfor %}
             </ul>
         </div>
