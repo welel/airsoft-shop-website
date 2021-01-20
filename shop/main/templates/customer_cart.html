@@ -1,0 +1,31 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block title %}Cart{% endblock %}
+
+{% block main %}
+<h2 class="text-center mt-5 mb-5">Your Cart</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Image</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+        <th scope="col">Total price</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for item in cart.items.all %}
+    <tr>
+      <th scope="row">{{item.content_object.title}}</th>
+      <td class="w-25"><img src="{{item.content_object.image.url}}" class="img-fluid" /></td>
+      <td>{{item.content_object.price}} $</td>
+      <td>{{item.content_object.quantity}}</td>
+        <td>{{item.content_object.total_price}}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

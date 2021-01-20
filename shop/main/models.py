@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -11,11 +10,7 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 User = get_user_model()
 
 
-def get_product_url(obj, view_name):
-    ct_model = obj.__class__.meta.model_name
-    return reverse(view_name, kwargs={'ct_model': ct_model, 'slug': obj.slug})
-
-
+# TODO: Add the function get_absolute_url-reverse and than change templates.
 class Category(MPTTModel):
 
     parent = TreeForeignKey('self', null=True, blank=True, 
@@ -88,9 +83,6 @@ class GunItem(Item):
     class Meta:
         verbose_name = 'Gun'
         verbose_name_plural = 'Guns'
-    
-    def get_absolute_url(self):
-        return get_product_url(self, 'product_detail')
 
 
 class AmmoItem(Item):
@@ -109,7 +101,7 @@ class GearItem(Item):
     category_parent = 'Tactical Gear'
 
     class Meta:
-        verbose_name = 'Tactial gear'
+        verbose_name = 'Tactical gear'
 
 
 class AccessoryItem(Item):
@@ -123,8 +115,8 @@ class AccessoryItem(Item):
 
 class CartItem(models.Model):
 
-    user = models.ForeignKey('Customer', on_delete=models.CASCADE,
-                             verbose_name='Customer')
+    customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
+                                 verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
                              related_name='related_item', verbose_name='Cart')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -135,7 +127,7 @@ class CartItem(models.Model):
                                       verbose_name='Total price')
       
     def __str__(self):
-        return 'Item: {} (for cart)'.format(self.item.title)
+        return 'Item: {} (in cart)'.format(self.content_object.title)
 
 
 class Cart(models.Model):
@@ -149,7 +141,9 @@ class Cart(models.Model):
                                               verbose_name='Total items')
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
                                       verbose_name='Total price')
-                                    
+    in_order = models.BooleanField(default=False)
+    for_anonymous_user = models.BooleanField(default=False)
+
     def __str__(self):
         return 'Cart: {}'.format(self.id)
 
@@ -162,7 +156,9 @@ class Customer(models.Model):
     address = models.CharField(max_length=255, verbose_name='Address')
     
     def __str__(self):
-        return 'User: {} {}'.format(self.user.first_name, self.user.last_name)
+        return 'User: {} {} ({})'.format(self.user.first_name,
+                                         self.user.last_name,
+                                         self.user.username)
 
 
 ITEMS = [GunItem, AmmoItem, GearItem, AccessoryItem]

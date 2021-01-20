@@ -1,11 +1,9 @@
 from django.contrib import admin
-from django import forms
 
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
 from .models import *
 from .forms import GunItemForm, AmmoItemForm, GearItemForm, AccessoryItemForm
-
 
 
 class GunItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
@@ -21,7 +19,7 @@ class GearItemAdmin(admin.ModelAdmin, DynamicArrayMixin):
 
 
 class AccessoryItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
-    form = AccessoryItemForm    
+    form = AccessoryItemForm
 
 
 admin.site.register(Category)

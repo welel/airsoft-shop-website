@@ -3,7 +3,6 @@ from functools import reduce
 
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.http import Http404
 from django.db.models import Q
 
 from .models import (
@@ -13,6 +12,8 @@ from .models import (
     GunItem,
     AccessoryItem,
     GearItem,
+    Customer,
+    Cart
 )
 
 
@@ -51,3 +52,11 @@ def items_category(request, category_slug):
     items = model.objects.filter(conditions)
     context = {'category': category, 'items': items}
     return TemplateResponse(request, 'category.html', context)
+
+
+def customer_cart(request):
+    """Renders a page with customer's cart."""
+    customer = get_object_or_404(Customer, user=request.user)
+    cart = get_object_or_404(Cart, owner=customer)
+    context = {'customer': customer, 'cart': cart}
+    return TemplateResponse(request, 'customer_cart.html', context)
