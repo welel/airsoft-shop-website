@@ -22,7 +22,10 @@
       </form>
       <ul class="navbar-nav ml-auto">
         <li class="nav-item">
-          <a href="{% url 'customer_cart' %}" class="nav-link text-white fw-bolder">Cart <span class="badge rounded-pill bg-warning text-dark">0</span></a>
+          <a href="{% url 'customer_cart' %}" class="nav-link text-white fw-bolder">
+            Cart
+            <span class="badge rounded-pill bg-warning text-dark">{% if cart %}{{cart.items.count}}{% else %}0{% endif %}</span>
+          </a>
         </li>
       </ul>
     </div>

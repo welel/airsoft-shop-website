@@ -4,6 +4,9 @@ from functools import reduce
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib.contenttypes.models import ContentType
 
 from .models import (
     Category,
@@ -13,7 +16,8 @@ from .models import (
     AccessoryItem,
     GearItem,
     Customer,
-    Cart
+    Cart,
+    CartItem
 )
 
 
@@ -56,7 +60,18 @@ def items_category(request, category_slug):
 
 def customer_cart(request):
     """Renders a page with customer's cart."""
-    customer = get_object_or_404(Customer, user=request.user)
-    cart = get_object_or_404(Cart, owner=customer)
-    context = {'customer': customer, 'cart': cart}
-    return TemplateResponse(request, 'customer_cart.html', context)
+    return TemplateResponse(request, 'customer_cart.html', {})
+
+
+def add_to_cart(request, category_slug, item_slug):
+    """Adds a `CartItem` to customer's cart."""
+    root_category = Category.objects.get(slug=category_slug).get_root().name
+    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
+    ct = ContentType.objects.get_for_model(item)
+    cart = request.initial_data['cart']
+    cart_item, created = CartItem.objects.get_or_create(
+        customer=cart.owner, cart=cart, content_type=ct, object_id=item.id,
+        total_price=item.price
+    )
+    cart.items.add(cart_item)
+    return HttpResponseRedirect(reverse_lazy('customer_cart'))
