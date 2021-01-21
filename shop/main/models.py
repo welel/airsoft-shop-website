@@ -129,10 +129,14 @@ class CartItem(models.Model):
     def __str__(self):
         return 'Item: {} (in cart)'.format(self.content_object.title)
 
+    def save(self, *args, **kwargs):
+        self.total_price = self.quantity * self.content_object.price
+        super().save(*args, **kwargs)
+
 
 class Cart(models.Model):
 
-    owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
+    owner = models.ForeignKey('Customer', null=True, on_delete=models.CASCADE,
                               verbose_name='Owner')
     items = models.ManyToManyField(CartItem, blank=True,
                                    related_name='related_cart',
@@ -140,12 +144,24 @@ class Cart(models.Model):
     total_items = models.PositiveIntegerField(default=0,
                                               verbose_name='Total items')
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-                                      verbose_name='Total price')
+                                      default=0, verbose_name='Total price')
     in_order = models.BooleanField(default=False)
     for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Cart: {}'.format(self.id)
+
+    def save(self, *args, **kwargs):
+        # TODO: PostgreSQL: Create a trigger on Update/Delete `items` in cart
+        #                   which count `total_price` instead of code below.
+        cart_data = self.items.aggregate(models.Sum('total_price'),
+                                         models.Count('id'))
+        total_price = cart_data['total_price__sum']
+        if not total_price:
+            total_price = 0
+        self.total_price = total_price
+        self.total_items = cart_data['id__count']
+        super().save(*args, **kwargs)
 
 
 class Customer(models.Model):

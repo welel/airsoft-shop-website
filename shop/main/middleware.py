@@ -13,6 +13,7 @@ class AddContextMiddleware:
         self.categories = Category.objects.root_nodes()
 
     def __call__(self, request):
+        # TODO: if_auth
         self.customer, created = Customer.objects.get_or_create(
             user=request.user)
         self.cart, created = Cart.objects.get_or_create(owner=self.customer,
