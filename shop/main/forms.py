@@ -10,7 +10,6 @@ from .models import (
 )
 
 
-
 class ItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,7 +21,7 @@ class ItemForm(forms.ModelForm):
             self.fields['category'].queryset = cqs
         
     class Meta:
-        exclude=('added', 'quantity_sold')
+        exclude = ('added', 'quantity_sold')
 
 
 GunItemForm = forms.modelform_factory(GunItem, form=ItemForm)
@@ -39,4 +38,4 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('first_name', 'last_name', 'phone', 'address', 'buying_type',
-                  'receiving_date', 'comment')
+                  'comment')

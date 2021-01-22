@@ -98,15 +98,11 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+
+STATICFILES_DIRS = (BASE_DIR.joinpath('static'),)
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR.joinpath('media')
 
-STATICFILES_DIRS = (
-    BASE_DIR.joinpath('static'),
-)
+MEDIA_ROOT = BASE_DIR.joinpath('media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

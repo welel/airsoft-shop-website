@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils import timezone
 from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey
@@ -39,14 +38,13 @@ class Item(models.Model):
     title = models.CharField(max_length=200, unique=True,
                              verbose_name='Title')
     slug = models.SlugField(max_length=100, unique=True)
-    description = models.TextField(max_length=2500,
+    description = models.TextField(max_length=2500, null=True, blank=True,
                                    verbose_name='Description')
     price = models.DecimalField(max_digits=9, decimal_places=2,
                                 verbose_name='Price')
     image = models.ImageField(default='ProductDefault.webp',
                               verbose_name='Image')
-    # TODO: Solve unique/null problem.
-    sku = models.CharField(max_length=16, unique=True, blank=True,
+    sku = models.CharField(max_length=20, unique=True, null=True, blank=True,
                            verbose_name='Stock Keeping Unit')
     features = ArrayField(models.CharField(max_length=150,
                           verbose_name='Feature'), blank=True, null=True,
@@ -190,15 +188,19 @@ class Customer(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              verbose_name='User')
-    phone = models.CharField(max_length=20, verbose_name='Phone')
-    address = models.CharField(max_length=1024, verbose_name='Address')
+    phone = models.CharField(max_length=20, null=True, blank=True,
+                             verbose_name='Phone')
+    address = models.CharField(max_length=1024, null=True, blank=True,
+                               verbose_name='Address')
     orders = models.ManyToManyField('Order', related_name='related_customer',
                                     verbose_name='Orders')
 
     def __str__(self):
-        return 'User: {} {} ({})'.format(self.user.first_name,
-                                         self.user.last_name,
-                                         self.user.username)
+        if self.user.first_name and self.user.last_name:
+            return 'User: {} {}'.format(self.user.first_name,
+                                        self.user.last_name)
+        else:
+            return 'User: {}'.format(self.user.username)
 
 
 class Order(models.Model):
@@ -244,8 +246,8 @@ class Order(models.Model):
                                verbose_name='Comment')
     created_at = models.DateTimeField(auto_now_add=True,
                                       verbose_name='Creation date')
-    receiving_date = models.DateField(verbose_name='Receiving date',
-                                      default=timezone.now)
+    receiving_date = models.DateField(verbose_name='Receiving date', null=True,
+                                      editable=False)
 
     def __str__(self):
         return '{} | {}'.format(self.id, self.customer)
