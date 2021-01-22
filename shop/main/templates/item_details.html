@@ -35,7 +35,11 @@
 				<img src="{{item.image.url}}" alt="item image" class="img-fluid" />
 				<form class="d-flex justify-content-around">
 					{{ csrf }}
-					<button type="button" class="btn btn-warning btn-lg text-white fw-bold">Add to Cart</button>
+					<a href="{% url 'add_to_cart' category_slug=item.category.slug item_slug=item.slug %}">
+						<button type="button" class="btn btn-warning btn-lg text-white fw-bold">
+							Add to Cart
+						</button>
+					</a>
 					<button type="button" class="btn btn-warning btn-lg text-white fw-bold">Add to Wishlist</button>
 				</form>
 			</div>

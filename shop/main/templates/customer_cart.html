@@ -1,0 +1,75 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block title %}Cart{% endblock %}
+
+{% block main %}
+
+
+{% if cart.items.count %}
+  <h2 class="text-center mt-5 mb-5">Your Cart</h2>
+  <table class="table">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+          <strong>{{message}}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <thead>
+      <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Image</th>
+        <th scope="col">Price</th>
+        <th scope="col">Quantity</th>
+          <th scope="col">Total price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in cart.items.all %}
+      <tr>
+        <th scope="row">{{item.content_object.title}}</th>
+        <td class="w-25"><img src="{{item.content_object.image.url}}" class="img-fluid" /></td>
+        <td>{{item.content_object.price}} $</td>
+        <td>
+          <form action="{% url 'change_cart_item_quantity' category_slug=item.content_object.category.slug item_slug=item.content_object.slug %}" method="POST">
+            {% csrf_token %}
+            <!-- TODO: Use JS for changing quantity of the cart item. -->
+            <input type="number" class="form-control" style="width: 4rem;" min="1" value="{{item.quantity}}" name="cart_item_quantity"/>
+            <input type="submit" class="mt-1" value="Change quantity"/>
+          </form>
+        </td>
+          <td>{{item.total_price}} $</td>
+        <td>
+          <a href="{% url 'delete_from_cart' category_slug=item.content_object.category.slug item_slug=item.content_object.slug %}">
+            <button class="btn btn-danger">Delete</button>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+      <tr>
+        <td colspan="2"></td>
+        <td>Total:</td>
+        <td><strong>{{cart.total_items}}</strong></td>
+        <td><strong>{{cart.total_price}} $</strong></td>
+      </tr>
+    </tbody>
+  </table>
+{% else %}
+  <div class="container mt-5">
+    <div class="row text-center fw-bolder">
+      <h2>Your cart is empty.</h2>
+    </div>
+    <div class="row text-center mt-4">
+      <a href="{% url 'index' %}">
+        <button class="btn btn-lg btn-warning text-white text-bold">SHOP NOW</button>
+      </a>
+    </div>
+  </div>
+{% endif %}
+
+
+{% endblock %}

@@ -3,8 +3,11 @@ from functools import reduce
 
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
-from django.http import Http404
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.urls import reverse_lazy
+from django.contrib.contenttypes.models import ContentType
+from django.contrib import messages
 
 from .models import (
     Category,
@@ -13,6 +16,9 @@ from .models import (
     GunItem,
     AccessoryItem,
     GearItem,
+    Customer,
+    Cart,
+    CartItem
 )
 
 
@@ -51,3 +57,61 @@ def items_category(request, category_slug):
     items = model.objects.filter(conditions)
     context = {'category': category, 'items': items}
     return TemplateResponse(request, 'category.html', context)
+
+
+def customer_cart(request):
+    """Renders a page with customer's cart."""
+    return TemplateResponse(request, 'customer_cart.html', {})
+
+
+# TODO: Merge add/delete `CartItem` views with a decorator.
+def add_to_cart(request, category_slug, item_slug):
+    """Adds a `CartItem` to customer's cart."""
+    root_category = Category.objects.get(slug=category_slug).get_root().name
+    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
+    ct = ContentType.objects.get_for_model(item)
+    cart = request.initial_data['cart']
+    cart_item, created = CartItem.objects.get_or_create(
+        customer=cart.owner, cart=cart, content_type=ct, object_id=item.id,
+    )
+    print(cart_item, created)
+    if created:
+        cart.items.add(cart_item)
+    else:
+        cart_item.quantity += 1
+        cart_item.save()
+    cart.save()
+    messages.add_message(request, messages.INFO, 'Product added successfully.')
+    return HttpResponseRedirect(reverse_lazy('customer_cart'))
+
+
+def delete_from_cart(request, category_slug, item_slug):
+    """Deletes a `CartItem` from customer's cart."""
+    root_category = Category.objects.get(slug=category_slug).get_root().name
+    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
+    ct = ContentType.objects.get_for_model(item)
+    cart = request.initial_data['cart']
+    cart_item = CartItem.objects.get(customer=cart.owner, cart=cart,
+                                     content_type=ct, object_id=item.id)
+    cart.items.remove(cart_item)
+    cart_item.delete()
+    cart.save()
+    messages.add_message(request, messages.INFO,
+                         'Product deleted successfully.')
+    return HttpResponseRedirect(reverse_lazy('customer_cart'))
+
+
+# TODO: Sort cart items in the cart with respect to '?'(decide later).
+def change_cart_item_quantity(request, category_slug, item_slug):
+    root_category = Category.objects.get(slug=category_slug).get_root().name
+    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
+    ct = ContentType.objects.get_for_model(item)
+    cart = request.initial_data['cart']
+    cart_item = CartItem.objects.get(customer=cart.owner, cart=cart,
+                                     content_type=ct, object_id=item.id)
+    cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
+    cart_item.save()
+    cart.save()
+    messages.add_message(request, messages.INFO,
+                         'Quantity changed successfully.')
+    return HttpResponseRedirect(reverse_lazy('customer_cart'))

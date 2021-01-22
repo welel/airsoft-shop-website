@@ -37,7 +37,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'main.middleware.CategoryMiddleware',
+    'main.middleware.AddContextMiddleware',
 ]
 
 ROOT_URLCONF = 'shop.urls'
@@ -60,6 +60,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shop.wsgi.application'
 
+# TODO: Replace NAME, USER, HOST, PORT to .env_sample.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
