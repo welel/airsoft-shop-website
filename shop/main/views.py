@@ -8,7 +8,9 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
+from django.db import transaction
 
+from .forms import OrderForm
 from .models import (
     Category,
     LatestItemManager,
@@ -16,9 +18,8 @@ from .models import (
     GunItem,
     AccessoryItem,
     GearItem,
-    Customer,
-    Cart,
-    CartItem
+    CartItem,
+    Order
 )
 
 
@@ -74,7 +75,6 @@ def add_to_cart(request, category_slug, item_slug):
     cart_item, created = CartItem.objects.get_or_create(
         customer=cart.owner, cart=cart, content_type=ct, object_id=item.id,
     )
-    print(cart_item, created)
     if created:
         cart.items.add(cart_item)
     else:
@@ -87,10 +87,10 @@ def add_to_cart(request, category_slug, item_slug):
 
 def delete_from_cart(request, category_slug, item_slug):
     """Deletes a `CartItem` from customer's cart."""
+    cart = request.initial_data['cart']
     root_category = Category.objects.get(slug=category_slug).get_root().name
     item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
     ct = ContentType.objects.get_for_model(item)
-    cart = request.initial_data['cart']
     cart_item = CartItem.objects.get(customer=cart.owner, cart=cart,
                                      content_type=ct, object_id=item.id)
     cart.items.remove(cart_item)
@@ -115,3 +115,24 @@ def change_cart_item_quantity(request, category_slug, item_slug):
     messages.add_message(request, messages.INFO,
                          'Quantity changed successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
+
+
+@transaction.atomic
+def make_order(request):
+    if request.method == 'POST':
+        order = Order(customer=request.initial_data['customer'])
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            order = form.save()
+            cart = request.initial_data['cart']
+            order.cart = cart
+            cart.in_order = True
+            cart.save(update_fields=["in_order"])
+            order.save(update_fields=["cart"])
+            request.initial_data['customer'].orders.add(order)
+            messages.add_message(request, messages.SUCCESS,
+                                 'Order was added successfully.')
+            return HttpResponseRedirect('/')
+    else:
+        form = OrderForm()
+    return TemplateResponse(request, 'checkout.html', {'form': form})

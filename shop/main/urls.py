@@ -6,7 +6,8 @@ from .views import (
     customer_cart,
     add_to_cart,
     delete_from_cart,
-    change_cart_item_quantity
+    change_cart_item_quantity,
+    make_order
 )
 
 
@@ -19,6 +20,7 @@ urlpatterns = [
          name='add_to_cart'),
     path('delete_from_cart/<str:category_slug>/<str:item_slug>/',
          delete_from_cart, name='delete_from_cart'),
+    path('checkout/', make_order, name='checkout'),
     path('<str:category_slug>/<str:item_slug>/', item_details,
          name='item_detail'),
     # TODO: Add some prefix to path.

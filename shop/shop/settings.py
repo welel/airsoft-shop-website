@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     
     'mptt',
     'django_better_admin_arrayfield',
+    'crispy_forms',
     
     'main.apps.MainConfig',
 ]
@@ -108,3 +109,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
