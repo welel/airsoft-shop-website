@@ -21,7 +21,7 @@
 					<a href="{% url 'add_to_cart' category_slug=item.category.slug item_slug=item.slug %}" class="buy-btn">Add to Card</a>
 				</div>
 				<div class="detail-box">
-					<a class="item-title" href="{% url 'item_detail' category_slug=item.category.slug item_slug=item.slug %}" class="item-title">{{ item.title }}</a>
+					<a class="item-title" href="{{item.get_absolute_url}}" class="item-title">{{ item.title }}</a>
 					<h1 class="item-price"><b>${{ item.price }}</b></h1>
 				</div>
 			</li>

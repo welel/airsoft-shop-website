@@ -21,8 +21,8 @@ urlpatterns = [
     path('delete_from_cart/<str:category_slug>/<str:item_slug>/',
          delete_from_cart, name='delete_from_cart'),
     path('checkout/', make_order, name='checkout'),
-    path('<str:category_slug>/<str:item_slug>/', item_details,
+    path('details/<str:category_slug>/<str:item_slug>/', item_details,
          name='item_detail'),
-    # TODO: Add some prefix to path.
-    path('<str:category_slug>/', items_category, name='items_category'),
+    path('category/<str:category_slug>/', items_category,
+         name='items_category'),
 ]

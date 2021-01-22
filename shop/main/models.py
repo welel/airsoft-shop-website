@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils import timezone
+from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -11,7 +12,6 @@ from django_better_admin_arrayfield.models.fields import ArrayField
 User = get_user_model()
 
 
-# TODO: Add the function get_absolute_url-reverse and than change templates.
 class Category(MPTTModel):
 
     parent = TreeForeignKey('self', null=True, blank=True, 
@@ -29,6 +29,9 @@ class Category(MPTTModel):
     
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('items_category', kwargs={'category_slug': self.slug})
 
 
 class Item(models.Model):
@@ -66,6 +69,10 @@ class Item(models.Model):
     
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('item_detail', kwargs={
+            'category_slug': self.category.slug, 'item_slug': self.slug})
 
 
 class GunItem(Item):
