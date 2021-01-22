@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.utils import timezone
 
 from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
@@ -18,7 +19,7 @@ class Category(MPTTModel):
     name = models.CharField(max_length=200, unique=True,
                             verbose_name='Category name')
     slug = models.SlugField(unique=True)
-    description = models.TextField(max_length=2500, null=True,  # TODO: null (temp for migrations)
+    description = models.TextField(max_length=2500, null=True, blank=True,
                                    verbose_name='Description')
     image = models.ImageField(default='ProductDefault.webp',
                               verbose_name='Image')
@@ -49,12 +50,13 @@ class Item(models.Model):
                           verbose_name='Features')
     color = models.CharField(max_length=50, blank=True,
                              verbose_name='Color')
-    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True,
-                                 verbose_name='Weight')
+    weight = models.DecimalField(max_digits=5, decimal_places=2, null=True,
+                                 blank=True, verbose_name='Weight')
     added = models.DateField(auto_now_add=True, blank=True,
                              verbose_name='Date added')
     category = models.ForeignKey(Category, on_delete=models.CASCADE,
                                  verbose_name='Category')
+    # TODO: Add logic for field.
     quantity_sold = models.PositiveIntegerField(default=0,
                                                 verbose_name='Quantity sold')
                       
@@ -69,16 +71,12 @@ class Item(models.Model):
 class GunItem(Item):
 
     category_parent = 'Airsoft Guns'
-    power_source = models.CharField(max_length=20, blank=True, 
+    power_source = models.CharField(max_length=20, null=True, blank=True,
                                     verbose_name='Power source')
     muzzle_velocity = models.PositiveIntegerField(
-        blank=True,
-        verbose_name='Muzzle velocity'
-    )
+        blank=True, null=True, verbose_name='Muzzle velocity')
     magazine_capacity = models.PositiveIntegerField(
-        blank=True,
-        verbose_name='Magazine capacity'
-    )
+        blank=True, null=True, verbose_name='Magazine capacity')
 
     class Meta:
         verbose_name = 'Gun'
@@ -152,15 +150,14 @@ class Cart(models.Model):
         return 'Cart: {}'.format(self.id)
 
     def save(self, *args, **kwargs):
-        # TODO: PostgreSQL: Create a trigger on Update/Delete `items` in cart
-        #                   which count `total_price` instead of code below.
-        cart_data = self.items.aggregate(models.Sum('total_price'),
-                                         models.Count('id'))
-        total_price = cart_data['total_price__sum']
-        if not total_price:
-            total_price = 0
-        self.total_price = total_price
-        self.total_items = cart_data['id__count']
+        if self.pk:
+            cart_data = self.items.aggregate(models.Sum('total_price'),
+                                             models.Count('id'))
+            total_price = cart_data['total_price__sum']
+            if not total_price:
+                total_price = 0
+            self.total_price = total_price
+            self.total_items = cart_data['id__count']
         super().save(*args, **kwargs)
 
 
@@ -169,8 +166,10 @@ class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              verbose_name='User')
     phone = models.CharField(max_length=20, verbose_name='Phone')
-    address = models.CharField(max_length=255, verbose_name='Address')
-    
+    address = models.CharField(max_length=1024, verbose_name='Address')
+    orders = models.ManyToManyField('Order', related_name='related_customer',
+                                    verbose_name='Orders')
+
     def __str__(self):
         return 'User: {} {} ({})'.format(self.user.first_name,
                                          self.user.last_name,
@@ -188,3 +187,53 @@ class LatestItemManager:
         for item_type in ITEMS:
             items.extend(item_type.objects.order_by('-id'))
         return items
+
+
+class Order(models.Model):
+
+    STATUS_NEW = 'new'
+    STATUS__IN_PROGRESS = 'in_progress'
+    STATUS_READY = 'is_ready'
+    STATUS_COMPLETED = 'completed'
+
+    BUYING_TYPE_SELF = 'self'
+    BUYING_TYPE_DELIVERY = 'delivery'
+
+    STATUS_CHOICES = (
+        (STATUS_NEW, 'New order'),
+        (STATUS__IN_PROGRESS, 'Order in progress'),
+        (STATUS_READY, 'Order is ready'),
+        (STATUS_COMPLETED, 'Order is completed')
+    )
+
+    BUYING_TYPE_CHOICE = (
+        (BUYING_TYPE_SELF, 'Self-pickup'),
+        (BUYING_TYPE_DELIVERY, 'Delivery')
+    )
+
+    customer = models.ForeignKey(
+        Customer, on_delete=models.CASCADE, related_name='related_orders',
+        verbose_name='Customer'
+    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE,
+                             verbose_name='Cart', null=True)
+    first_name = models.CharField(max_length=255, verbose_name='First name')
+    last_name = models.CharField(max_length=255, verbose_name='Last name')
+    phone = models.CharField(max_length=20, verbose_name='Phone')
+    address = models.CharField(max_length=1024, verbose_name='Address',
+                               null=True, blank=True)
+    status = models.CharField(max_length=100, verbose_name='Status',
+                              choices=STATUS_CHOICES, default=STATUS_NEW)
+    buying_type = models.CharField(
+        max_length=100, verbose_name='Buying type', choices=BUYING_TYPE_CHOICE,
+        default=BUYING_TYPE_SELF
+    )
+    comment = models.TextField(max_length=3000, null=True, blank=True,
+                               verbose_name='Comment')
+    created_at = models.DateTimeField(auto_now_add=True,
+                                      verbose_name='Creation date')
+    receiving_date = models.DateField(verbose_name='Receiving date',
+                                      default=timezone.now)
+
+    def __str__(self):
+        return '{} | {}'.format(self.id, self.customer)

@@ -1,0 +1,59 @@
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Cart{% endblock %}
+
+{% block main %}
+
+
+<h2 class="text-center mt-5 mb-5">Checkout</h2>
+<table class="table">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Image</th>
+      <th scope="col">Price</th>
+      <th scope="col">Quantity</th>
+        <th scope="col">Total price</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for item in cart.items.all %}
+    <tr>
+      <th scope="row">{{item.content_object.title}}</th>
+      <td class="w-25"><img src="{{item.content_object.image.url}}" class="img-fluid" /></td>
+      <td>{{item.content_object.price}} $</td>
+      <td>
+        <input type="number" class="form-control" style="width: 4rem;" min="1" value="{{item.quantity}}" name="cart_item_quantity" readonly />
+      </td>
+      <td>{{item.total_price}} $</td>
+    </tr>
+  {% endfor %}
+    <tr>
+      <td colspan="2"></td>
+      <td>Total:</td>
+      <td><strong>{{cart.total_items}}</strong></td>
+      <td><strong>{{cart.total_price}} $</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="container">
+  <form action="" method="POST">
+    {% csrf_token %}
+    <h2 class="text-center mt-5 mb-5">Order form</h2>
+    {{form|crispy}}
+    <input type="submit" class="btn-lg btn-success btn-block mb-3 mt-3 fw-bold" values="Send Order">
+  </form>
+</div>
+{% endblock %}
