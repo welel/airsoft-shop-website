@@ -1,19 +1,23 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.urls import reverse
 
-from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 User = get_user_model()
 
 
-# TODO: Add the function get_absolute_url-reverse and than change templates.
 class Category(MPTTModel):
+    """Category of salable products.
 
+    Categories organized in a tree. Each product has one category.
+    Products can't have root categories.
+
+    """
     parent = TreeForeignKey('self', null=True, blank=True, 
                             related_name='children', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, unique=True,
@@ -30,20 +34,27 @@ class Category(MPTTModel):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('items_category', kwargs={'category_slug': self.slug})
+
 
 class Item(models.Model):
-    
+    """Abstract model of a salable product.
+
+    ..Item - each subclass starts with name of product and ends
+             with "Item".
+
+    """
     title = models.CharField(max_length=200, unique=True,
                              verbose_name='Title')
     slug = models.SlugField(max_length=100, unique=True)
-    description = models.TextField(max_length=2500,
+    description = models.TextField(max_length=2500, null=True, blank=True,
                                    verbose_name='Description')
     price = models.DecimalField(max_digits=9, decimal_places=2,
                                 verbose_name='Price')
     image = models.ImageField(default='ProductDefault.webp',
                               verbose_name='Image')
-    # TODO: Solve unique/null problem.
-    sku = models.CharField(max_length=16, unique=True, blank=True,
+    sku = models.CharField(max_length=20, unique=True, null=True, blank=True,
                            verbose_name='Stock Keeping Unit')
     features = ArrayField(models.CharField(max_length=150,
                           verbose_name='Feature'), blank=True, null=True,
@@ -66,6 +77,10 @@ class Item(models.Model):
     
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('item_detail', kwargs={
+            'category_slug': self.category.slug, 'item_slug': self.slug})
 
 
 class GunItem(Item):
@@ -111,8 +126,33 @@ class AccessoryItem(Item):
         verbose_name_plural = 'Accessories'
 
 
-class CartItem(models.Model):
+# Mapping - root category on class (type).
+CATEGORY_MODEL = {
+    GunItem.category_parent: GunItem,
+    AmmoItem.category_parent: AmmoItem,
+    AccessoryItem.category_parent: AccessoryItem,
+    GearItem.category_parent: GearItem,
+}
 
+
+class LatestItemManager:
+    """Manager gets all existing items.
+
+    TODO: Rid of this class.
+
+    """
+    @staticmethod
+    def get_last_items():
+        items = []
+        for item_class in CATEGORY_MODEL.values():
+            items.extend(item_class.objects.order_by('-id'))
+        return items
+
+
+class CartItem(models.Model):
+    """Represents a product for the client's cart.
+
+    """
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
                                  verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
@@ -133,7 +173,9 @@ class CartItem(models.Model):
 
 
 class Cart(models.Model):
+    """Represents client's cart.
 
+    """
     owner = models.ForeignKey('Customer', null=True, on_delete=models.CASCADE,
                               verbose_name='Owner')
     items = models.ManyToManyField(CartItem, blank=True,
@@ -162,35 +204,30 @@ class Cart(models.Model):
 
 
 class Customer(models.Model):
+    """Represents a client of the store.
 
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              verbose_name='User')
-    phone = models.CharField(max_length=20, verbose_name='Phone')
-    address = models.CharField(max_length=1024, verbose_name='Address')
+    phone = models.CharField(max_length=20, null=True, blank=True,
+                             verbose_name='Phone')
+    address = models.CharField(max_length=1024, null=True, blank=True,
+                               verbose_name='Address')
     orders = models.ManyToManyField('Order', related_name='related_customer',
                                     verbose_name='Orders')
 
     def __str__(self):
-        return 'User: {} {} ({})'.format(self.user.first_name,
-                                         self.user.last_name,
-                                         self.user.username)
-
-
-ITEMS = [GunItem, AmmoItem, GearItem, AccessoryItem]
-
-
-class LatestItemManager:
-
-    @staticmethod
-    def get_last_items():
-        items = []
-        for item_type in ITEMS:
-            items.extend(item_type.objects.order_by('-id'))
-        return items
+        if self.user.first_name and self.user.last_name:
+            return 'User: {} {}'.format(self.user.first_name,
+                                        self.user.last_name)
+        else:
+            return 'User: {}'.format(self.user.username)
 
 
 class Order(models.Model):
+    """Represents a client's order of list of products.
 
+    """
     STATUS_NEW = 'new'
     STATUS__IN_PROGRESS = 'in_progress'
     STATUS_READY = 'is_ready'
@@ -232,8 +269,8 @@ class Order(models.Model):
                                verbose_name='Comment')
     created_at = models.DateTimeField(auto_now_add=True,
                                       verbose_name='Creation date')
-    receiving_date = models.DateField(verbose_name='Receiving date',
-                                      default=timezone.now)
+    receiving_date = models.DateField(verbose_name='Receiving date', null=True,
+                                      editable=False)
 
     def __str__(self):
         return '{} | {}'.format(self.id, self.customer)

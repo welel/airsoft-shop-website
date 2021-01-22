@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-PROJECT_DIR = os.path.dirname(BASE_DIR)
+PROJECT_DIR = BASE_DIR.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -61,15 +61,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shop.wsgi.application'
 
-# TODO: Replace NAME, USER, HOST, PORT to .env_sample.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'airsoftstore',
-        'USER': 'postgres',
+        'NAME': os.getenv('DATABASE_NAME'),
+        'USER': os.getenv('DATABASE_USER'),
         'PASSWORD': os.getenv('DATABASE_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'HOST': os.getenv('DATABASE_HOST'),
+        'PORT': os.getenv('DATABASE_PORT'),
     }
 }
 
@@ -99,15 +98,11 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+
+STATICFILES_DIRS = (BASE_DIR.joinpath('static'),)
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+MEDIA_ROOT = BASE_DIR.joinpath('media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -2,23 +2,33 @@ from django.contrib import admin
 
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
-from .models import *
-from .forms import GunItemForm, AmmoItemForm, GearItemForm, AccessoryItemForm
+from .forms import AccessoryItemForm, AmmoItemForm, GearItemForm, GunItemForm
+from .models import (
+    AccessoryItem,
+    AmmoItem,
+    Cart,
+    CartItem,
+    Category,
+    Customer,
+    GearItem,
+    GunItem,
+    Order
+)
 
 
-class GunItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+class GunItemAdmin(admin.ModelAdmin, DynamicArrayMixin):
     form = GunItemForm
 
 
-class AmmoItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+class AmmoItemAdmin(admin.ModelAdmin, DynamicArrayMixin):
     form = AmmoItemForm
 
 
-class GearItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+class GearItemAdmin(admin.ModelAdmin, DynamicArrayMixin):
     form = GearItemForm
 
 
-class AccessoryItemAdmin(admin.ModelAdmin, DynamicArrayMixin):  
+class AccessoryItemAdmin(admin.ModelAdmin, DynamicArrayMixin):
     form = AccessoryItemForm
 
 
