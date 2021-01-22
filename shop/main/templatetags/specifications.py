@@ -1,19 +1,22 @@
-"""The filter `specifications` forms html code of item details.
+"""The filters of the module forms html code of item details.
 
-There is the filters to form:
-    * Other details (item_spec).
-    * Features (item_features).
+There is the filters for building:
+    * "Other details" (`item_spec`) - specifications for subclasses
+                                      of ``Item``.
+    * "Features" (`item_features`) - list of features of subclasses
+                                     of ``Item``.
 
 """
 from django import template
 from django.utils.safestring import mark_safe
 
-from ..models import GunItem, GearItem, AmmoItem, AccessoryItem
+from ..models import AccessoryItem, AmmoItem, GearItem, GunItem
 
 
 register = template.Library()
 
 
+# HTML blanks for formatting.
 SPEC_LIST = '''
     <p class="fs-5 pt-2">Other details:</p>
     <ul class="list-unstyled">
@@ -30,6 +33,7 @@ ROW = '<li class="fs-5">{name}: {value} {metric}</li>'
 ROW2 = '<li class="fs-5">{feature}</li>'
 
 
+# Item's specifications for each subclass of ``Item`` model.
 ITEM_SPECS = {
     GunItem.category_parent: {
         'power_source': {'label': 'Power source', 'metric': ''},
@@ -50,6 +54,7 @@ ITEM_SPECS = {
 
 
 def get_item_spec(item):
+    """Builds html rows of item's specifications and returns it."""
     content = []
     for spec_dict in (ITEM_SPECS[item.category_parent], ITEM_SPECS['All']):
         for field, info in spec_dict.items():
@@ -61,12 +66,14 @@ def get_item_spec(item):
 
 @register.filter
 def item_spec(item):
+    """Builds html table of item's specifications and returns it."""
     spec = get_item_spec(item)
     return mark_safe(SPEC_LIST.format(rows=spec))
 
 
 @register.filter
 def item_features(item):
+    """Builds html list of item's features and returns it."""
     content = []
     if not item.features:
         return ''

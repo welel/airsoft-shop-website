@@ -1,30 +1,30 @@
 """Views of main application.
 
 Many of views use `request.initial_data` dict.
-This dict may store:
+This dictionary may store:
     customer (Customer) - current customer.
     cart (Cart) - current customer's cart.
     item (Item subclass) - an item taken by url query.
     cart_item (CartItem) - a cart item gotten from database
                            by item or created.
 Note that customer and cart available everywhere (initializing in
-middleware), but item and cart_item available only by using decorators
-from `.utils` module.
+middleware), but `item` and `cart_item` available only by using
+decorators from `.utils` module.
 
 """
 import operator
 from functools import reduce
 
-from django.template.response import TemplateResponse
-from django.db.models import Q
-from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
+from django.urls import reverse_lazy
 
 from .forms import OrderForm
-from .models import CATEGORY_MODEL, Category, LatestItemManager, Order
-from .utils import get_item, get_cart_item
+from .models import Category, CATEGORY_MODEL, LatestItemManager, Order
+from .utils import get_cart_item, get_item
 
 
 def index(request):
@@ -62,7 +62,7 @@ def customer_cart(request):
 
 @get_cart_item
 def add_to_cart(request):
-    """Adds a `CartItem` to customer's cart."""
+    """Adds a ``CartItem`` instance to customer's cart."""
     cart = request.initial_data['cart']
     cart_item, created = request.initial_data['cart_item'].values()
     if created:
@@ -77,7 +77,7 @@ def add_to_cart(request):
 
 @get_cart_item
 def delete_from_cart(request):
-    """Deletes a `CartItem` from customer's cart."""
+    """Deletes a ``CartItem`` instance from customer's cart."""
     cart = request.initial_data['cart']
     cart_item, created = request.initial_data['cart_item'].values()
     cart.items.remove(cart_item)
@@ -88,10 +88,10 @@ def delete_from_cart(request):
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
-# TODO: Sort cart items in the cart with respect to '?'(decide later).
+# TODO: Sort cart items in the cart with respect to item's title.
 @get_cart_item
 def change_cart_item_quantity(request):
-    cart = request.initial_data['cart']
+    """Changes quantity of items in a ``CartItem`` instance."""
     cart_item, created = request.initial_data['cart_item'].values()
     cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
     cart_item.save()
@@ -103,6 +103,12 @@ def change_cart_item_quantity(request):
 
 @transaction.atomic
 def make_order(request):
+    """Handles an order page and POST request.
+
+    GET method: renders order table and order form.
+    POST method: validates filled form and creates an order.
+
+    """
     if request.method == 'POST':
         order = Order(customer=request.initial_data['customer'])
         form = OrderForm(request.POST, instance=order)

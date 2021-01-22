@@ -1,4 +1,4 @@
-from .models import Category, Cart, Customer
+from .models import Cart, Category, Customer
 
 
 class AddContextMiddleware:

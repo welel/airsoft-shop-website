@@ -1,11 +1,11 @@
 from django import forms
 
 from .models import (
-    GunItem,
-    GearItem,
-    AmmoItem,
     AccessoryItem,
+    AmmoItem,
     Category,
+    GearItem,
+    GunItem,
     Order
 )
 

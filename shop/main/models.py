@@ -1,18 +1,23 @@
-from django.db import models
 from django.contrib.auth import get_user_model
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
 from django.urls import reverse
 
-from mptt.models import MPTTModel, TreeForeignKey
 from django_better_admin_arrayfield.models.fields import ArrayField
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 User = get_user_model()
 
 
 class Category(MPTTModel):
+    """Category of salable products.
 
+    Categories organized in a tree. Each product has one category.
+    Products can't have root categories.
+
+    """
     parent = TreeForeignKey('self', null=True, blank=True, 
                             related_name='children', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, unique=True,
@@ -34,7 +39,12 @@ class Category(MPTTModel):
 
 
 class Item(models.Model):
-    
+    """Abstract model of a salable product.
+
+    ..Item - each subclass starts with name of product and ends
+             with "Item".
+
+    """
     title = models.CharField(max_length=200, unique=True,
                              verbose_name='Title')
     slug = models.SlugField(max_length=100, unique=True)
@@ -116,6 +126,7 @@ class AccessoryItem(Item):
         verbose_name_plural = 'Accessories'
 
 
+# Mapping - root category on class (type).
 CATEGORY_MODEL = {
     GunItem.category_parent: GunItem,
     AmmoItem.category_parent: AmmoItem,
@@ -125,7 +136,11 @@ CATEGORY_MODEL = {
 
 
 class LatestItemManager:
+    """Manager gets all existing items.
 
+    TODO: Rid of this class.
+
+    """
     @staticmethod
     def get_last_items():
         items = []
@@ -135,7 +150,9 @@ class LatestItemManager:
 
 
 class CartItem(models.Model):
+    """Represents a product for the client's cart.
 
+    """
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
                                  verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
@@ -156,7 +173,9 @@ class CartItem(models.Model):
 
 
 class Cart(models.Model):
+    """Represents client's cart.
 
+    """
     owner = models.ForeignKey('Customer', null=True, on_delete=models.CASCADE,
                               verbose_name='Owner')
     items = models.ManyToManyField(CartItem, blank=True,
@@ -185,7 +204,9 @@ class Cart(models.Model):
 
 
 class Customer(models.Model):
+    """Represents a client of the store.
 
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              verbose_name='User')
     phone = models.CharField(max_length=20, null=True, blank=True,
@@ -204,7 +225,9 @@ class Customer(models.Model):
 
 
 class Order(models.Model):
+    """Represents a client's order of list of products.
 
+    """
     STATUS_NEW = 'new'
     STATUS__IN_PROGRESS = 'in_progress'
     STATUS_READY = 'is_ready'

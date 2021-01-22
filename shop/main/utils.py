@@ -1,18 +1,18 @@
 """Module contains decorators that gets data from database for views."""
 from functools import wraps
 
-from django.shortcuts import get_object_or_404
 from django.contrib.contenttypes.models import ContentType
+from django.shortcuts import get_object_or_404
 
-from .models import CATEGORY_MODEL, Category, CartItem
+from .models import CartItem, Category, CATEGORY_MODEL
 
 
 def get_item(view):
-    """Adds an instance of subclass of Item to request and calls view.
+    """Adds an instance of subclass of ``Item`` to `request` and calls view.
 
-    Gets `category_slug` and `item_slug` from url and gets *Item object
-    by slugs and adds `item` and it's ContentType to request information.
-    Then sends request to a view.
+    Gets `category_slug` and `item_slug` from url and gets ``..Item``
+    object by slugs and adds `item` and it's ``ContentType`` to
+    `request` additional information. Then sends `request` to a view.
 
     """
     @wraps(view)
@@ -30,10 +30,10 @@ def get_item(view):
 
 
 def get_cart_item(view):
-    """Adds an instance of CartItem to request and calls view.
+    """Adds an instance of ``CartItem`` to `request` and calls view.
 
-    Gets CartItem or creates new one and adds to request information.
-    Then sends request to a view.
+    Gets ``CartItem`` or creates new one and adds to `request`
+    additional information. Then sends `request` to a view.
 
     """
     @get_item
