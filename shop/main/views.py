@@ -1,34 +1,30 @@
+"""Views of main application.
+
+Many of views use `request.initial_data` dict.
+This dict may store:
+    customer (Customer) - current customer.
+    cart (Cart) - current customer's cart.
+    item (Item subclass) - an item taken by url query.
+    cart_item (CartItem) - a cart item gotten from database
+                           by item or created.
+Note that customer and cart available everywhere (initializing in
+middleware), but item and cart_item available only by using decorators
+from `.utils` module.
+
+"""
 import operator
 from functools import reduce
 
-from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from django.contrib.contenttypes.models import ContentType
 from django.contrib import messages
 from django.db import transaction
 
 from .forms import OrderForm
-from .models import (
-    Category,
-    LatestItemManager,
-    AmmoItem,
-    GunItem,
-    AccessoryItem,
-    GearItem,
-    CartItem,
-    Order
-)
-
-
-CATEGORY_MODEL = {
-    GunItem.category_parent: GunItem,
-    AmmoItem.category_parent: AmmoItem,
-    AccessoryItem.category_parent: AccessoryItem,
-    GearItem.category_parent: GearItem,
-}
+from .models import CATEGORY_MODEL, Category, LatestItemManager, Order
+from .utils import get_item, get_cart_item
 
 
 def index(request):
@@ -37,12 +33,11 @@ def index(request):
     return TemplateResponse(request, 'index.html', {'items': items})
 
 
-def item_details(request, category_slug, item_slug):
+@get_item
+def item_details(request):
     """Renders an item details page."""
-    root_category = Category.objects.get(slug=category_slug).get_root().name
-    model = CATEGORY_MODEL[root_category]
-    item = get_object_or_404(model, slug=item_slug)
-    return TemplateResponse(request, 'item_details.html', {'item': item})
+    context = {'item': request.initial_data['item']['object']}
+    return TemplateResponse(request, 'item_details.html', context)
 
 
 # TODO: Read `mptt` docs and find out a better way to filter items.
@@ -65,16 +60,11 @@ def customer_cart(request):
     return TemplateResponse(request, 'customer_cart.html', {})
 
 
-# TODO: Merge add/delete `CartItem` views with a decorator.
-def add_to_cart(request, category_slug, item_slug):
+@get_cart_item
+def add_to_cart(request):
     """Adds a `CartItem` to customer's cart."""
-    root_category = Category.objects.get(slug=category_slug).get_root().name
-    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
-    ct = ContentType.objects.get_for_model(item)
     cart = request.initial_data['cart']
-    cart_item, created = CartItem.objects.get_or_create(
-        customer=cart.owner, cart=cart, content_type=ct, object_id=item.id,
-    )
+    cart_item, created = request.initial_data['cart_item'].values()
     if created:
         cart.items.add(cart_item)
     else:
@@ -85,14 +75,11 @@ def add_to_cart(request, category_slug, item_slug):
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
-def delete_from_cart(request, category_slug, item_slug):
+@get_cart_item
+def delete_from_cart(request):
     """Deletes a `CartItem` from customer's cart."""
     cart = request.initial_data['cart']
-    root_category = Category.objects.get(slug=category_slug).get_root().name
-    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
-    ct = ContentType.objects.get_for_model(item)
-    cart_item = CartItem.objects.get(customer=cart.owner, cart=cart,
-                                     content_type=ct, object_id=item.id)
+    cart_item, created = request.initial_data['cart_item'].values()
     cart.items.remove(cart_item)
     cart_item.delete()
     cart.save()
@@ -102,13 +89,10 @@ def delete_from_cart(request, category_slug, item_slug):
 
 
 # TODO: Sort cart items in the cart with respect to '?'(decide later).
-def change_cart_item_quantity(request, category_slug, item_slug):
-    root_category = Category.objects.get(slug=category_slug).get_root().name
-    item = get_object_or_404(CATEGORY_MODEL[root_category], slug=item_slug)
-    ct = ContentType.objects.get_for_model(item)
+@get_cart_item
+def change_cart_item_quantity(request):
     cart = request.initial_data['cart']
-    cart_item = CartItem.objects.get(customer=cart.owner, cart=cart,
-                                     content_type=ct, object_id=item.id)
+    cart_item, created = request.initial_data['cart_item'].values()
     cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
     cart_item.save()
     cart.save()

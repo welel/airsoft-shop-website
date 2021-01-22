@@ -111,6 +111,24 @@ class AccessoryItem(Item):
         verbose_name_plural = 'Accessories'
 
 
+CATEGORY_MODEL = {
+    GunItem.category_parent: GunItem,
+    AmmoItem.category_parent: AmmoItem,
+    AccessoryItem.category_parent: AccessoryItem,
+    GearItem.category_parent: GearItem,
+}
+
+
+class LatestItemManager:
+
+    @staticmethod
+    def get_last_items():
+        items = []
+        for item_class in CATEGORY_MODEL.values():
+            items.extend(item_class.objects.order_by('-id'))
+        return items
+
+
 class CartItem(models.Model):
 
     customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
@@ -174,19 +192,6 @@ class Customer(models.Model):
         return 'User: {} {} ({})'.format(self.user.first_name,
                                          self.user.last_name,
                                          self.user.username)
-
-
-ITEMS = [GunItem, AmmoItem, GearItem, AccessoryItem]
-
-
-class LatestItemManager:
-
-    @staticmethod
-    def get_last_items():
-        items = []
-        for item_type in ITEMS:
-            items.extend(item_type.objects.order_by('-id'))
-        return items
 
 
 class Order(models.Model):
