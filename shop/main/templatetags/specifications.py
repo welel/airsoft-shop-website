@@ -3,9 +3,12 @@
 There is the filters to form:
     * Other details (item_spec).
     * Features (item_features).
+
 """
 from django import template
 from django.utils.safestring import mark_safe
+
+from ..models import GunItem, GearItem, AmmoItem, AccessoryItem
 
 
 register = template.Library()
@@ -23,38 +26,36 @@ FEATURES_LIST = '''
         {rows}
     </ul>
 '''
-ROW = '<li class="fs-5">{name}: {value}</li>'
+ROW = '<li class="fs-5">{name}: {value} {metric}</li>'
 ROW2 = '<li class="fs-5">{feature}</li>'
 
 
-# TODO: Add able to display FPS, gram, ect. metrics.
 ITEM_SPECS = {
-    'Airsoft Guns': {
-        'Power source': 'power_source',
-        'Muzzle velocity': 'muzzle_velocity',
-        'Magazine capacity': 'magazine_capacity'
+    GunItem.category_parent: {
+        'power_source': {'label': 'Power source', 'metric': ''},
+        'muzzle_velocity': {'label': 'Muzzle velocity', 'metric': 'FPS'},
+        'magazine_capacity': {'label': 'Magazine capacity', 'metric': 'BB'}
     },
-    'BBS & Pellets': {
-        'Diameter': 'diameter',
-        'Quantity': 'quantity'
+    AmmoItem.category_parent: {
+        'diameter': {'label': 'Diameter', 'metric': 'mm'},
+        'quantity': {'label': 'Quantity', 'metric': 'BB'}
     },
+    GearItem.category_parent: {},
+    AccessoryItem.category_parent: {},
     'All': {
-        'Color': 'color',
-        'Weight': 'weight'
+        'color': {'label': 'Color', 'metric': ''},
+        'weight': {'label': 'Weight', 'metric': 'lbs'}
     }
 }
 
 
-# TODO: safer
 def get_item_spec(item):
     content = []
     for spec_dict in (ITEM_SPECS[item.category_parent], ITEM_SPECS['All']):
-        for name, value in spec_dict.items():
-            value = getattr(item, value)
-            if not value:
-                print(value)
-                continue
-            content.append(ROW.format(name=name, value=value))
+        for field, info in spec_dict.items():
+            value = getattr(item, field)
+            content.append(ROW.format(name=info['label'], value=value,
+                                      metric=info['metric']))
     return '\n'.join(content)
 
 
