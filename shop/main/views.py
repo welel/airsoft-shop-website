@@ -95,7 +95,7 @@ def change_cart_item_quantity(request):
     cart_item, created = request.initial_data['cart_item'].values()
     cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
     cart_item.save()
-    cart.save()
+    cart_item.save(update_fields=['quantity'])
     messages.add_message(request, messages.INFO,
                          'Quantity changed successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))

@@ -32,9 +32,6 @@ AccessoryItemForm = forms.modelform_factory(AccessoryItem, form=ItemForm)
 
 class OrderForm(forms.ModelForm):
 
-    receiving_date = forms.DateField(
-        widget=forms.TextInput(attrs={'type': 'date'}))
-
     class Meta:
         model = Order
         fields = ('first_name', 'last_name', 'phone', 'address', 'buying_type',
