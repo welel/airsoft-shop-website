@@ -3,6 +3,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 from django_better_admin_arrayfield.models.fields import ArrayField
 from mptt.models import MPTTModel, TreeForeignKey
@@ -22,7 +23,7 @@ class Category(MPTTModel):
                             related_name='children', on_delete=models.CASCADE)
     name = models.CharField(max_length=200, unique=True,
                             verbose_name='Category name')
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField(unique=True, max_length=200, editable=False)
     description = models.TextField(max_length=2500, null=True, blank=True,
                                    verbose_name='Description')
     image = models.ImageField(default='ProductDefault.webp',
@@ -30,6 +31,12 @@ class Category(MPTTModel):
     
     class MPTTMeta:
         order_insertion_by = ['name']
+
+    def save(self, *args, **kwargs):
+        slug = slugify(self.title, allow_unicode=True)
+        if not self.slug or self.slug != slug:
+            self.slug = slug
+        super().save(*args, **kwargs)
     
     def __str__(self):
         return self.name
@@ -47,7 +54,7 @@ class Item(models.Model):
     """
     title = models.CharField(max_length=200, unique=True,
                              verbose_name='Title')
-    slug = models.SlugField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, editable=False)
     description = models.TextField(max_length=2500, null=True, blank=True,
                                    verbose_name='Description')
     price = models.DecimalField(max_digits=9, decimal_places=2,
@@ -77,6 +84,12 @@ class Item(models.Model):
     
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        slug = slugify(self.title, allow_unicode=True)
+        if not self.slug or self.slug != slug:
+            self.slug = slug
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('item_detail', kwargs={
