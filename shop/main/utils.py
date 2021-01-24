@@ -1,4 +1,11 @@
-"""Module contains decorators that gets data from database for views."""
+"""Module contains useful decorators and functions.
+
+Decorators that get data from database for views:
+    get_item
+    get_cart_item
+
+"""
+import datetime
 from functools import wraps
 
 from django.contrib.contenttypes.models import ContentType
@@ -42,7 +49,7 @@ def get_cart_item(view):
         request = args[0]
         cart = request.initial_data['cart']
         cart_item, created = CartItem.objects.get_or_create(
-            customer=cart.owner, cart=cart,
+            cart=cart,
             content_type=request.initial_data['item']['content_type'],
             object_id=request.initial_data['item']['object'].id
         )
@@ -50,3 +57,17 @@ def get_cart_item(view):
                                              'created': created}
         return view(request)
     return wrapper
+
+
+def set_cookie(response, key, value, days_expire=7):
+    max_age = days_expire * 24 * 60 * 60
+    expires = datetime.datetime.strftime(
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
+        "%a, %d-%b-%Y %H:%M:%S GMT",
+    )
+    response.set_cookie(
+        key,
+        value,
+        max_age=max_age,
+        expires=expires
+    )

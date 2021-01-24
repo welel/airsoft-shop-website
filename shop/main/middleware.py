@@ -1,24 +1,7 @@
-import datetime
 import uuid
 
 from .models import AnonymousUser, Cart, Category, Customer
-
-
-def set_cookie(response, key, value, days_expire=7):
-    if days_expire is None:
-        max_age = 365 * 24 * 60 * 60  # one year
-    else:
-        max_age = days_expire * 24 * 60 * 60
-    expires = datetime.datetime.strftime(
-        datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
-        "%a, %d-%b-%Y %H:%M:%S GMT",
-    )
-    response.set_cookie(
-        key,
-        value,
-        max_age=max_age,
-        expires=expires
-    )
+from .utils import set_cookie
 
 
 class AddContextMiddleware:
@@ -36,15 +19,19 @@ class AddContextMiddleware:
         anon_identifier = request.COOKIES.get('anon_identifier')
         if request.user.is_authenticated:
             # Gets a customer and a cart by a registered user
+            print('REGISTERED')
             self.customer = Customer.objects.get(registered=request.user)
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
+            print(self.cart.__dict__)
         elif anon_identifier:
+            print('ANON')
             # Gets a customer and a cart by an anonymous user
             user = AnonymousUser.objects.get(identifier=anon_identifier)
             self.customer = Customer.objects.get(anonymous=user)
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
         else:
             # Creates an anonymous user and a cart
+            print('FIRST TIME')
             self.anon_identifier = uuid.uuid4()
             user = AnonymousUser.objects.create(
                 identifier=self.anon_identifier)

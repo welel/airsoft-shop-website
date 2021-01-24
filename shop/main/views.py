@@ -16,14 +16,25 @@ import operator
 from functools import reduce
 
 from django.contrib import messages
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.urls import reverse_lazy
 
 from .forms import OrderForm
-from .models import Category, CATEGORY_MODEL, LatestItemManager, Order
+from .models import (
+    AnonymousUser,
+    Cart,
+    Category,
+    Customer,
+    CATEGORY_MODEL,
+    LatestItemManager,
+    Order
+)
 from .utils import get_cart_item, get_item
 
 
@@ -126,3 +137,34 @@ def make_order(request):
     else:
         form = OrderForm()
     return TemplateResponse(request, 'checkout.html', {'form': form})
+
+
+@transaction.atomic
+def signup(request):
+    if request.method == 'POST':
+        response = HttpResponseRedirect('/')
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            customer = Customer.objects.create(registered=user)
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            anon_identifier = request.COOKIES.get('anon_identifier')
+            if anon_identifier:
+                anon_user = AnonymousUser.objects.get(
+                    identifier=anon_identifier)
+                anon_customer = Customer.objects.get(anonymous=anon_user)
+                cart = Cart.objects.get(owner=anon_customer, in_order=False)
+                cart.owner = customer
+                cart.save()
+                anon_user.delete()
+                anon_customer.delete()
+                response.delete_cookie('anon_identifier')
+            else:
+                cart = Cart.objects.create(owner=customer)
+            return response
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})

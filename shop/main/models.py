@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -166,8 +167,6 @@ class CartItem(models.Model):
     """Represents a product for the client's cart.
 
     """
-    customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
-                                 verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
                              related_name='related_item', verbose_name='Cart')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -199,7 +198,6 @@ class Cart(models.Model):
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
                                       default=0, verbose_name='Total price')
     in_order = models.BooleanField(default=False)
-    #for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Cart: {}'.format(self.id)
@@ -231,6 +229,14 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return 'User: {}'.format(self.user.username)
+
+
+def create_profile(sender, **kwargs):
+    user = kwargs['instance']
+    if kwargs['created']:
+        user_profile = UserProfile(user=user)
+        user_profile.save()
+post_save.connect(create_profile, sender=User)
 
 
 # TODO: max_length = ~32; set expire
