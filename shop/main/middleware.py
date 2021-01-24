@@ -1,4 +1,24 @@
-from .models import Cart, Category, Customer
+import datetime
+import uuid
+
+from .models import AnonymousUser, Cart, Category, Customer
+
+
+def set_cookie(response, key, value, days_expire=7):
+    if days_expire is None:
+        max_age = 365 * 24 * 60 * 60  # one year
+    else:
+        max_age = days_expire * 24 * 60 * 60
+    expires = datetime.datetime.strftime(
+        datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age),
+        "%a, %d-%b-%Y %H:%M:%S GMT",
+    )
+    response.set_cookie(
+        key,
+        value,
+        max_age=max_age,
+        expires=expires
+    )
 
 
 class AddContextMiddleware:
@@ -13,13 +33,27 @@ class AddContextMiddleware:
         self.categories = Category.objects.root_nodes()
 
     def __call__(self, request):
-        # TODO: if_auth
-        self.customer, created = Customer.objects.get_or_create(
-            user=request.user)
-        self.cart, created = Cart.objects.get_or_create(owner=self.customer,
-                                                        in_order=False)
+        anon_identifier = request.COOKIES.get('anon_identifier')
+        if request.user.is_authenticated:
+            # Gets a customer and a cart by a registered user
+            self.customer = Customer.objects.get(registered=request.user)
+            self.cart = Cart.objects.get(owner=self.customer, in_order=False)
+        elif anon_identifier:
+            # Gets a customer and a cart by an anonymous user
+            user = AnonymousUser.objects.get(identifier=anon_identifier)
+            self.customer = Customer.objects.get(anonymous=user)
+            self.cart = Cart.objects.get(owner=self.customer, in_order=False)
+        else:
+            # Creates an anonymous user and a cart
+            self.anon_identifier = uuid.uuid4()
+            user = AnonymousUser.objects.create(
+                identifier=self.anon_identifier)
+            self.customer = Customer.objects.create(anonymous=user)
+            self.cart = Cart.objects.create(owner=self.customer)
         request.initial_data = {'customer': self.customer, 'cart': self.cart}
         response = self.get_response(request)
+        if not (request.user.is_authenticated or anon_identifier):
+            set_cookie(response, 'anon_identifier', self.anon_identifier)
         return response
 
     def process_template_response(self, request, response):
