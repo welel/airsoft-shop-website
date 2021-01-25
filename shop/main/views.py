@@ -13,7 +13,6 @@ decorators from `.utils` module.
 
 """
 import operator
-import uuid
 from functools import reduce
 
 from django.contrib import messages
@@ -29,7 +28,6 @@ from django.urls import reverse, reverse_lazy
 
 from .forms import OrderForm
 from .models import (
-    AnonymousUser,
     Cart,
     Category,
     Customer,
@@ -37,7 +35,7 @@ from .models import (
     LatestItemManager,
     Order
 )
-from .utils import get_cart_item, get_item, set_cookie
+from .utils import free_anonymous, get_cart_item, get_item
 
 
 def index(request):
@@ -142,6 +140,7 @@ def make_order(request):
     return TemplateResponse(request, 'checkout.html', {'form': form})
 
 
+@free_anonymous
 @transaction.atomic
 def signup(request):
     if request.method == 'POST':
@@ -150,29 +149,20 @@ def signup(request):
             response = HttpResponseRedirect(reverse('index'))
             user = form.save()
             customer = Customer.objects.create(registered=user)
+            cart = Cart.objects.create(owner=customer)
+            response.cart = cart
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            anon_identifier = request.COOKIES.get('anon_identifier')
-            if anon_identifier:
-                anon_user = AnonymousUser.objects.get(
-                    identifier=anon_identifier)
-                anon_customer = Customer.objects.get(anonymous=anon_user)
-                cart = Cart.objects.get(owner=anon_customer, in_order=False)
-                cart.owner = customer
-                cart.save()
-                anon_user.delete()
-                anon_customer.delete()
-                response.delete_cookie('anon_identifier')
-            else:
-                cart = Cart.objects.create(owner=customer)
             return response
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
 
+@free_anonymous
+@transaction.atomic
 def signin(request):
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
@@ -181,9 +171,10 @@ def signin(request):
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=raw_password)
+            customer = Customer.objects.get(registered=user)
+            cart = Cart.objects.get(owner=customer, in_order=False)
+            response.cart = cart
             login(request, user)
-            # TODO: add cart items from anonymous cart (and delete anon user)
-            response.delete_cookie('anon_identifier')
             return response
     else:
         form = AuthenticationForm()
