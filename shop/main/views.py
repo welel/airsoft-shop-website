@@ -13,17 +13,19 @@ decorators from `.utils` module.
 
 """
 import operator
+import uuid
 from functools import reduce
 
 from django.contrib import messages
-from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from .forms import OrderForm
 from .models import (
@@ -35,7 +37,7 @@ from .models import (
     LatestItemManager,
     Order
 )
-from .utils import get_cart_item, get_item
+from .utils import get_cart_item, get_item, set_cookie
 
 
 def index(request):
@@ -112,6 +114,7 @@ def change_cart_item_quantity(request):
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
+@login_required(login_url='signin')
 @transaction.atomic
 def make_order(request):
     """Handles an order page and POST request.
@@ -133,7 +136,7 @@ def make_order(request):
             request.initial_data['customer'].orders.add(order)
             messages.add_message(request, messages.SUCCESS,
                                  'Order was added successfully.')
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = OrderForm()
     return TemplateResponse(request, 'checkout.html', {'form': form})
@@ -142,9 +145,9 @@ def make_order(request):
 @transaction.atomic
 def signup(request):
     if request.method == 'POST':
-        response = HttpResponseRedirect('/')
         form = UserCreationForm(request.POST)
         if form.is_valid():
+            response = HttpResponseRedirect(reverse('index'))
             user = form.save()
             customer = Customer.objects.create(registered=user)
             username = form.cleaned_data.get('username')
@@ -168,3 +171,26 @@ def signup(request):
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
+
+
+def signin(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            response = HttpResponseRedirect(reverse('index'))
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            # TODO: add cart items from anonymous cart (and delete anon user)
+            response.delete_cookie('anon_identifier')
+            return response
+    else:
+        form = AuthenticationForm()
+    return render(request, 'signin.html', {'form': form})
+
+
+@login_required()
+def logout_(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('index'))

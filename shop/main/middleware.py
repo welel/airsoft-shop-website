@@ -11,35 +11,38 @@ class AddContextMiddleware:
     After: adds `categories`, `cart`, `customer` to template context.
 
     """
+    anon_created = False
+
     def __init__(self, get_response):
         self.get_response = get_response
         self.categories = Category.objects.root_nodes()
 
     def __call__(self, request):
-        anon_identifier = request.COOKIES.get('anon_identifier')
         if request.user.is_authenticated:
             # Gets a customer and a cart by a registered user
             print('REGISTERED')
             self.customer = Customer.objects.get(registered=request.user)
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
-            print(self.cart.__dict__)
-        elif anon_identifier:
+        elif 'anon_identifier' in request.COOKIES:
             print('ANON')
             # Gets a customer and a cart by an anonymous user
-            user = AnonymousUser.objects.get(identifier=anon_identifier)
+            self.anon_identifier = request.COOKIES.get('anon_identifier')
+            user = AnonymousUser.objects.get(identifier=self.anon_identifier)
             self.customer = Customer.objects.get(anonymous=user)
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
         else:
             # Creates an anonymous user and a cart
             print('FIRST TIME')
             self.anon_identifier = uuid.uuid4()
+            self.anon_created = True
             user = AnonymousUser.objects.create(
                 identifier=self.anon_identifier)
             self.customer = Customer.objects.create(anonymous=user)
             self.cart = Cart.objects.create(owner=self.customer)
         request.initial_data = {'customer': self.customer, 'cart': self.cart}
         response = self.get_response(request)
-        if not (request.user.is_authenticated or anon_identifier):
+        if self.anon_created:
+            self.anon_created = False
             set_cookie(response, 'anon_identifier', self.anon_identifier)
         return response
 
