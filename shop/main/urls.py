@@ -8,7 +8,10 @@ from .views import (
     index,
     item_details,
     items_category,
-    make_order
+    logout_,
+    make_order,
+    signin,
+    signup
 )
 
 
@@ -26,4 +29,7 @@ urlpatterns = [
     path('checkout/', make_order, name='checkout'),
     path('change_qty/<str:category_slug>/<str:item_slug>/',
          change_cart_item_quantity, name='change_cart_item_quantity'),
+    path('signin/', signin, name='signin'),
+    path('logout/', logout_, name='logout'),
+    path('signup/', signup, name='signup'),
 ]

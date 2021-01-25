@@ -6,7 +6,8 @@ from .models import (
     Category,
     GearItem,
     GunItem,
-    Order
+    Order,
+    User
 )
 
 
@@ -36,3 +37,10 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ('first_name', 'last_name', 'phone', 'address', 'buying_type',
                   'comment')
+
+
+class UserForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')

@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.db.models.signals import post_save
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -166,8 +167,6 @@ class CartItem(models.Model):
     """Represents a product for the client's cart.
 
     """
-    customer = models.ForeignKey('Customer', on_delete=models.CASCADE,
-                                 verbose_name='Customer')
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
                              related_name='related_item', verbose_name='Cart')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
@@ -189,7 +188,7 @@ class Cart(models.Model):
     """Represents client's cart.
 
     """
-    owner = models.ForeignKey('Customer', null=True, on_delete=models.CASCADE,
+    owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
                               verbose_name='Owner')
     items = models.ManyToManyField(CartItem, blank=True,
                                    related_name='related_cart',
@@ -199,7 +198,6 @@ class Cart(models.Model):
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
                                       default=0, verbose_name='Total price')
     in_order = models.BooleanField(default=False)
-    for_anonymous_user = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Cart: {}'.format(self.id)
@@ -216,12 +214,12 @@ class Cart(models.Model):
         super().save(*args, **kwargs)
 
 
-class Customer(models.Model):
-    """Represents a client of the store.
+class UserProfile(models.Model):
+    """Profile of registered client of the store.
 
     """
-    user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             verbose_name='User')
+    user = models.OneToOneField(User,  on_delete=models.CASCADE,
+                                related_name='user', verbose_name='User')
     phone = models.CharField(max_length=20, null=True, blank=True,
                              verbose_name='Phone')
     address = models.CharField(max_length=1024, null=True, blank=True,
@@ -230,11 +228,39 @@ class Customer(models.Model):
                                     verbose_name='Orders')
 
     def __str__(self):
-        if self.user.first_name and self.user.last_name:
-            return 'User: {} {}'.format(self.user.first_name,
-                                        self.user.last_name)
-        else:
-            return 'User: {}'.format(self.user.username)
+        return 'User: {}'.format(self.user.username)
+
+
+def create_profile(sender, **kwargs):
+    user = kwargs['instance']
+    if kwargs['created']:
+        user_profile = UserProfile(user=user)
+        user_profile.save()
+post_save.connect(create_profile, sender=User)
+
+
+# TODO: max_length = ~32; set expire
+class AnonymousUser(models.Model):
+    """Represents anonymous users.
+
+    Helps attach a cart to a non-registered user.
+
+    """
+    identifier = models.UUIDField(verbose_name='Identifier')
+    expire = models.DateField(auto_now_add=True, verbose_name='Expire')
+
+    def __str__(self):
+        return 'Anonymous user {}'.format(self.identifier)
+
+
+class Customer(models.Model):
+    """Represents any customer on the site (registered or not).
+
+    """
+    registered = models.OneToOneField(User, null=True,
+                                      on_delete=models.CASCADE)
+    anonymous = models.OneToOneField(AnonymousUser, null=True,
+                                     on_delete=models.CASCADE)
 
 
 class Order(models.Model):
