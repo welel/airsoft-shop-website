@@ -56,7 +56,7 @@
         <td><strong>{{cart.total_items}}</strong></td>
         <td><strong>{{cart.total_price}} $</strong></td>
         <td>
-          <a href="">
+          <a href="{% url 'clear_cart' %}">
             <button class="btn btn-danger">Clear cart</button>
           </a>
         </td>

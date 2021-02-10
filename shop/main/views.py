@@ -1,15 +1,15 @@
-"""Views of main application.
+"""Views of the main application.
 
 Many of views use `request.initial_data` dict.
 This dictionary may store:
-    customer (Customer) - current customer.
-    cart (Cart) - current customer's cart.
-    item (Item subclass) - an item taken by url query.
-    cart_item (CartItem) - a cart item gotten from database
-                           by item or created.
-Note that customer and cart available everywhere (initializing in
+    customer (Customer) - a current customer.
+    cart (Cart) - a current customer's cart.
+    item (Item subclass) - an item taken by an url query.
+    cart_item (CartItem) - a cart item gotten from the database
+                           by an item or created.
+Note that a customer and a cart available everywhere (initializing in
 middleware), but `item` and `cart_item` available only by using
-decorators from `.utils` module.
+decorators from the module - `.utils`.
 
 """
 import operator
@@ -53,7 +53,7 @@ def item_details(request):
 
 # TODO: Read `mptt` docs and find out a better way to filter items.
 def items_category(request, category_slug):
-    """Renders a page with items by category."""
+    """Renders a page with items by a category."""
     category = Category.objects.get(slug=category_slug)
     root_category = category.get_root()
     model = CATEGORY_MODEL[root_category.name]
@@ -67,13 +67,13 @@ def items_category(request, category_slug):
 
 
 def customer_cart(request):
-    """Renders a page with customer's cart."""
+    """Renders a page of a customer's cart."""
     return TemplateResponse(request, 'customer_cart.html', {})
 
 
 @get_cart_item
 def add_to_cart(request):
-    """Adds a ``CartItem`` instance to customer's cart."""
+    """Adds a ``CartItem`` instance to a cart."""
     cart = request.initial_data['cart']
     cart_item, created = request.initial_data['cart_item'].values()
     if created:
@@ -88,7 +88,7 @@ def add_to_cart(request):
 
 @get_cart_item
 def delete_from_cart(request):
-    """Deletes a ``CartItem`` instance from customer's cart."""
+    """Deletes a ``CartItem`` instance from a cart."""
     cart = request.initial_data['cart']
     cart_item, created = request.initial_data['cart_item'].values()
     cart.items.remove(cart_item)
@@ -99,7 +99,17 @@ def delete_from_cart(request):
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
-# TODO: Sort cart items in the cart with respect to item's title.
+def clear_cart(request):
+    """Deletes all cart items from a cart."""
+    cart = request.initial_data['cart']
+    for cart_item in cart.items.all():
+        cart_item.delete()
+    messages.add_message(request, messages.INFO,
+                         'The cart cleared successfully.')
+    return HttpResponseRedirect(reverse_lazy('customer_cart'))
+
+
+# TODO: Sort cart items in a cart with respect to a item's title.
 @get_cart_item
 def change_cart_item_quantity(request):
     """Changes quantity of items in a ``CartItem`` instance."""
@@ -117,8 +127,8 @@ def change_cart_item_quantity(request):
 def make_order(request):
     """Handles an order page and POST request.
 
-    GET method: renders order table and order form.
-    POST method: validates filled form and creates an order.
+    GET method: renders an order table and an order form.
+    POST method: validates a filled form and creates an order.
 
     """
     if request.method == 'POST':
