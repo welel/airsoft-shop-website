@@ -16,21 +16,22 @@ This is an e-commerce website of airsoft guns and equipment.
 
 # Installation
 
-1. Clone repository.
+1. [Install PostgreSQL](https://www.postgresql.org/download/) and create new database.
 
-2. Install PostgreSQL.
+2. Clone repository.
+   
+3. Install requirements.
 
-3. Install requirements (`requirements.txt`).
+4. Create virtual environment and activate it.
 
-4. Fill and rename `.env_sample`.
+5. Install requirements from the file.
 
-5. Make migrations.
+   `pip3 install -r requirements.txt`
 
-6. Fill database with initial data in `shop/initial_data`.
+   > Note: Ubuntu requires `libpq-dev` and `python-dev` before installation.
 
-   ​	Use command: `manage.py loaddata <file name>`.
+6. Fill and rename `.env_sample`.
 
-   1. `category.json`
-   2. `guns.json`
+7. Make migrations.
 
-7. Run the server `manage.py runserver`.
+8. Run the server `python3 manage.py runserver`.
