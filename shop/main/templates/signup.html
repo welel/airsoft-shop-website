@@ -1,10 +1,46 @@
 {% extends 'layouts/base.html' %}
 
 {% block main %}
-  <h2>Sign up</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Sign up</button>
-  </form>
+<div class="container">
+    <div class="row">
+        <h1 class="fw-bold mt-5">Sign up</h1>
+        <form method="post" class="mt-4">
+            {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Email address</label>
+            <input type="email" class="form-control" name="username" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" name="password1">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm password</label>
+            <input type="password" class="form-control" name="password2">
+          </div>
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+<div class="container mt-5">
+    <div class="row">
+        {% if form.errors %}
+            {% for field in form %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong><b>{{ field.label }}:</b> {{ error }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong><b>{{ field.label }}:</b> {{ error }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
+
+

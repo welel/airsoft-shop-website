@@ -1,3 +1,5 @@
+<!-- TODO: Optimize mobile version. -->
+
 {% extends 'layouts/base.html' %}
 
 {% load static %}
@@ -8,11 +10,28 @@
 	<img src="{% static 'img/poster.webp' %}" alt="poster" width="100%" />
 </div>
 
-<div class="content-top">
-	<h1 class="text-center"><b>Top sellers</b></h1>
-	<ul>
+<div class="container-md mt-5">
+	<h1 class="text-center text-uppercase fw-bold">categories</h1>
+    <div class="row row-cols-1 row-cols-md-2 g-4 mt-4">
+        {% for category in categories %}
+          <div class="col">
+            <div class="card">
+              <img src="..." class="card-img-top" alt="...">
+              <div class="card-body">
+                <h5 class="card-title"><a class="link-dark" href="{{category.get_absolute_url}}">{{category}}</a></h5>
+                <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="content-top mt-5">
+	<h1 class="text-center text-uppercase fw-bold">featured products</h1>
+	<ul class="mt-3">
 		{% for item in items %}
-			<li class="box mt-3">
+			<li class="box mt-5">
 				<div class="slide-img">
 					<img src="{{ item.image.url }}">
 				</div>

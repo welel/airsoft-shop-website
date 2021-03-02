@@ -1,15 +1,43 @@
 {% load static %}
 
-<footer class="container-fluid bg-dark mt-5">
-    <div class="row">
-        <div class="col-sm-4">
-            <h5 class="text-center text-secondary mt-2">Categories</h5>
-            <ul class="list-unstyled text-center">
+<footer class="pt-4 pb-md-5 mt-5 pt-md-5 border-top bg-dark">
+        <div class="row" style="width: 100%;">
+          <div class="col-6 col-md ms-4">
+            <h5 class="text-light fw-bold">Categories</h5>
+            <ul class="list-unstyled text-small">
                 {% for category in categories %}
-                    <li class="mt-1"><a href="{{category.get_absolute_url}}" class="text-white fw-bolder text-decoration-none">{{ category }}</a></li>
+                    <li>
+                        <a class="text-muted" href="{{category.get_absolute_url}}">
+                            {{category}}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
+          </div>
+          <div class="col-6 col-md ms-3">
+            <h5 class="text-light fw-bold">Resources</h5>
+            <ul class="list-unstyled text-small">
+              <li><a class="text-muted" href="#">Resource</a></li>
+              <li><a class="text-muted" href="#">Resource name</a></li>
+              <li><a class="text-muted" href="#">Another resource</a></li>
+              <li><a class="text-muted" href="#">Final resource</a></li>
+            </ul>
+          </div>
+          <div class="col-6 col-md ms-3">
+            <h5 class="text-light fw-bold">About</h5>
+            <ul class="list-unstyled text-small">
+              <li class="text-light"><a class="text-muted" href="#">Team</a></li>
+              <li><a class="text-muted" href="#">Locations</a></li>
+              <li><a class="text-muted" href="#">Privacy</a></li>
+              <li><a class="text-muted" href="#">Terms</a></li>
+            </ul>
+          </div>
+          <div class="col-12 col-md">
+            <img class="mb-2" src="{% static 'img/brand_logo.svg' %}" alt="logo" width="24" height="24" style="width: 100%;">
+            <small class="d-block mb-3 text-muted text-center">&copy; 2020-2021</small>
+          </div>
         </div>
-        <div class="col-sm-8 bg-dark">Spam</div>
+    <div class="row" style="width: 100%;">
+        <p class="text-light text-center ps-6" style="padding: 50px;"><b class="text-warning">Important Notice:</b> All Airsoft guns are sold with an orange tip. It is illegal to remove the orange tip. Removing the orange tip will void your warranty. You must be 18 years of age or older to purchase any Airsoft gun. For more information read our Airsoft Disclaimer. You must be 18 years of age or older to order!</p>
     </div>
 </footer>

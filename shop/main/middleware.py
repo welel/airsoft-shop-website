@@ -20,11 +20,9 @@ class AddContextMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             # Gets a customer and a cart by a registered user
-            print('REGISTERED')
             self.customer = Customer.objects.get(registered=request.user)
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
         elif 'anon_identifier' in request.COOKIES:
-            print('ANON')
             # Gets a customer and a cart by an anonymous user
             self.anon_identifier = request.COOKIES.get('anon_identifier')
             user = AnonymousUser.objects.get(identifier=self.anon_identifier)
@@ -32,7 +30,6 @@ class AddContextMiddleware:
             self.cart = Cart.objects.get(owner=self.customer, in_order=False)
         else:
             # Creates an anonymous user and a cart
-            print('FIRST TIME')
             self.anon_identifier = uuid.uuid4()
             self.anon_created = True
             user = AnonymousUser.objects.create(

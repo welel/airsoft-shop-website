@@ -18,7 +18,7 @@ register = template.Library()
 
 # HTML blanks for formatting.
 SPEC_LIST = '''
-    <p class="fs-5 pt-2">Other details:</p>
+    <p class="fs-5 pt-2 fw-bold">Other details</p>
     <ul class="list-unstyled">
         {rows}
     </ul>
