@@ -2,11 +2,7 @@
 
 <footer class="pt-4 pb-md-5 mt-5 pt-md-5 border-top bg-dark">
         <div class="row" style="width: 100%;">
-          <div class="col-12 col-md">
-            <img class="mb-2" src="{% static 'img/brand_logo.svg' %}" alt="logo" width="24" height="24" style="width: 100%;">
-            <small class="d-block mb-3 text-muted text-center">&copy; 2020-2021</small>
-          </div>
-          <div class="col-6 col-md ms-3">
+          <div class="col-6 col-md ms-4">
             <h5 class="text-light fw-bold">Categories</h5>
             <ul class="list-unstyled text-small">
                 {% for category in categories %}
@@ -35,6 +31,10 @@
               <li><a class="text-muted" href="#">Privacy</a></li>
               <li><a class="text-muted" href="#">Terms</a></li>
             </ul>
+          </div>
+          <div class="col-12 col-md">
+            <img class="mb-2" src="{% static 'img/brand_logo.svg' %}" alt="logo" width="24" height="24" style="width: 100%;">
+            <small class="d-block mb-3 text-muted text-center">&copy; 2020-2021</small>
           </div>
         </div>
     <div class="row" style="width: 100%;">
