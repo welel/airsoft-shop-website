@@ -11,6 +11,9 @@ Note that a customer and a cart available everywhere (initializing in
 middleware), but `item` and `cart_item` available only by using
 decorators from the module - `.utils`.
 
+TODO:
+    * Fix a bug with double message appearance.
+
 """
 import operator
 from functools import reduce
@@ -82,7 +85,7 @@ def add_to_cart(request):
         cart_item.quantity += 1
         cart_item.save()
     cart.save()
-    messages.add_message(request, messages.INFO, 'Product added successfully.')
+    messages.info(request, 'Product added successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
@@ -94,8 +97,7 @@ def delete_from_cart(request):
     cart.items.remove(cart_item)
     cart_item.delete()
     cart.save()
-    messages.add_message(request, messages.INFO,
-                         'Product deleted successfully.')
+    messages.info(request, 'Product deleted successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
@@ -104,8 +106,7 @@ def clear_cart(request):
     cart = request.initial_data['cart']
     for cart_item in cart.items.all():
         cart_item.delete()
-    messages.add_message(request, messages.INFO,
-                         'The cart cleared successfully.')
+    messages.info(request, 'The cart cleared successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
@@ -117,8 +118,7 @@ def change_cart_item_quantity(request):
     cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
     cart_item.save()
     cart_item.save(update_fields=['quantity'])
-    messages.add_message(request, messages.INFO,
-                         'Quantity changed successfully.')
+    messages.info(request, 'Quantity changed successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
@@ -142,8 +142,7 @@ def make_order(request):
             cart.save(update_fields=["in_order"])
             order.save(update_fields=["cart"])
             request.initial_data['customer'].orders.add(order)
-            messages.add_message(request, messages.SUCCESS,
-                                 'Order was added successfully.')
+            messages.info(request, 'Order was added successfully.')
             return HttpResponseRedirect(reverse('index'))
     else:
         form = OrderForm()
