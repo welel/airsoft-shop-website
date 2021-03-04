@@ -268,7 +268,7 @@ class Order(models.Model):
 
     """
     STATUS_NEW = 'new'
-    STATUS__IN_PROGRESS = 'in_progress'
+    STATUS_IN_PROGRESS = 'in_progress'
     STATUS_READY = 'is_ready'
     STATUS_COMPLETED = 'completed'
 
@@ -277,7 +277,7 @@ class Order(models.Model):
 
     STATUS_CHOICES = (
         (STATUS_NEW, 'New order'),
-        (STATUS__IN_PROGRESS, 'Order in progress'),
+        (STATUS_IN_PROGRESS, 'Order in progress'),
         (STATUS_READY, 'Order is ready'),
         (STATUS_COMPLETED, 'Order is completed')
     )
