@@ -9,7 +9,6 @@ from .models import (
     Cart,
     CartItem,
     Category,
-    Customer,
     GearItem,
     GunItem,
     Order
@@ -39,5 +38,4 @@ admin.site.register(GearItem, GearItemAdmin)
 admin.site.register(AccessoryItem, AccessoryItemAdmin)
 admin.site.register(CartItem)
 admin.site.register(Cart)
-admin.site.register(Customer)
 admin.site.register(Order)

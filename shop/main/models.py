@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -7,9 +6,6 @@ from django.utils.text import slugify
 
 from django_better_admin_arrayfield.models.fields import ArrayField
 from mptt.models import MPTTModel, TreeForeignKey
-
-
-User = get_user_model()
 
 
 class Category(MPTTModel):
@@ -170,7 +166,7 @@ class Cart(models.Model):
     """Represents client's cart.
 
     """
-    owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
+    owner = models.ForeignKey('user.Customer', on_delete=models.CASCADE,
                               null=True)
     total_items = models.PositiveIntegerField(default=0)
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
@@ -190,18 +186,6 @@ class Cart(models.Model):
         else:
             self.total_price, self.total_items = 0, 0
         super().save(*args, **kwargs)
-
-
-class Customer(models.Model):
-    """Profile of registered client of the store.
-
-    """
-    user = models.OneToOneField(User,  on_delete=models.CASCADE)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    address = models.CharField(max_length=1024, null=True, blank=True)
-
-    def __str__(self):
-        return 'User: {}'.format(self.user.username)
 
 
 class Order(models.Model):
@@ -228,7 +212,7 @@ class Order(models.Model):
         (BUYING_TYPE_DELIVERY, 'Delivery')
     )
 
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey('user.Customer', on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)

@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     
     'main.apps.MainConfig',
+    'user.apps.UserConfig'
 ]
 
 MIDDLEWARE = [
@@ -47,7 +48,9 @@ ROOT_URLCONF = 'shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            PROJECT_DIR.joinpath('frontend/templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,11 +104,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    BASE_DIR.joinpath('static'),
+    PROJECT_DIR.joinpath('frontend/static'),
 ]
 
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = BASE_DIR.joinpath('media')
+MEDIA_ROOT = PROJECT_DIR.joinpath('frontend/media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

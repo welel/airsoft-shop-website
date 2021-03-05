@@ -1,5 +1,6 @@
-from .models import Cart, Category, Customer
+from .models import Cart, Category
 from .utils import set_cookie
+from user.models import Customer
 
 
 class CategoryMiddleware:
