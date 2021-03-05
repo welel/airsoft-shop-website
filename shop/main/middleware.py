@@ -1,50 +1,52 @@
-import uuid
-
-from .models import AnonymousUser, Cart, Category, Customer
+from .models import Cart, Category, Customer
 from .utils import set_cookie
 
 
-class AddContextMiddleware:
-    """A middleware provides additional info to views and templates.
-
-    Before: adds ``Customer`` and ``Cart`` to `request`.
-    After: adds `categories`, `cart`, `customer` to template context.
+class CategoryMiddleware:
+    """A middleware provides root categories to templates.
 
     """
-    anon_created = False
 
     def __init__(self, get_response):
         self.get_response = get_response
         self.categories = Category.objects.root_nodes()
 
     def __call__(self, request):
-        if request.user.is_authenticated:
-            # Gets a customer and a cart by a registered user
-            self.customer = Customer.objects.get(registered=request.user)
-            self.cart = Cart.objects.get(owner=self.customer, in_order=False)
-        elif 'anon_identifier' in request.COOKIES:
-            # Gets a customer and a cart by an anonymous user
-            self.anon_identifier = request.COOKIES.get('anon_identifier')
-            user = AnonymousUser.objects.get(identifier=self.anon_identifier)
-            self.customer = Customer.objects.get(anonymous=user)
-            self.cart = Cart.objects.get(owner=self.customer, in_order=False)
-        else:
-            # Creates an anonymous user and a cart
-            self.anon_identifier = uuid.uuid4()
-            self.anon_created = True
-            user = AnonymousUser.objects.create(
-                identifier=self.anon_identifier)
-            self.customer = Customer.objects.create(anonymous=user)
-            self.cart = Cart.objects.create(owner=self.customer)
-        request.initial_data = {'customer': self.customer, 'cart': self.cart}
-        response = self.get_response(request)
-        if self.anon_created:
-            self.anon_created = False
-            set_cookie(response, 'anon_identifier', self.anon_identifier)
-        return response
+        return self.get_response(request)
 
     def process_template_response(self, request, response):
         response.context_data['categories'] = self.categories
-        response.context_data['cart'] = self.cart
-        response.context_data['customer'] = self.customer
+        return response
+
+
+class ShoppingCartMiddleware:
+    """A middleware manages a shopping cart (``Cart``).
+
+    A middleware provides `cart_id` for views. If an user is
+    authenticated 'cart_id' gets from the database by a customer.
+    If an user is anonymous `cart_id` gets from the cookie or
+    creates new one.
+    After request `cart_id` attaches to the cookie.
+    Also a middleware provides a ``Cart`` instance to templates.
+
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            customer = Customer.objects.get(user=request.user)
+            request.COOKIES['cart_id'] = Cart.objects.get(owner=customer,
+                                                          in_order=False).pk
+        elif 'cart_id' not in request.COOKIES:
+            request.COOKIES['cart_id'] = Cart.objects.create().pk
+        response = self.get_response(request)
+        if 'cart_id' not in response.cookies:
+            set_cookie(response, 'cart_id', request.COOKIES['cart_id'])
+        return response
+
+    def process_template_response(self, request, response):
+        cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+        response.context_data['cart'] = cart
         return response

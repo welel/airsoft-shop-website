@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.db.models.signals import post_save
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -25,10 +24,8 @@ class Category(MPTTModel):
     name = models.CharField(max_length=200, unique=True,
                             verbose_name='Category name')
     slug = models.SlugField(unique=True, max_length=200, editable=False)
-    description = models.TextField(max_length=2500, null=True, blank=True,
-                                   verbose_name='Description')
-    image = models.ImageField(default='ProductDefault.webp',
-                              verbose_name='Image')
+    description = models.TextField(max_length=2500, null=True, blank=True)
+    image = models.ImageField(default='ProductDefault.webp')
     
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -53,31 +50,20 @@ class Item(models.Model):
              with "Item".
 
     """
-    title = models.CharField(max_length=200, unique=True,
-                             verbose_name='Title')
+    title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True, editable=False)
-    description = models.TextField(max_length=2500, null=True, blank=True,
-                                   verbose_name='Description')
-    price = models.DecimalField(max_digits=9, decimal_places=2,
-                                verbose_name='Price')
-    image = models.ImageField(default='ProductDefault.webp',
-                              verbose_name='Image')
-    sku = models.CharField(max_length=20, unique=True, null=True, blank=True,
-                           verbose_name='Stock Keeping Unit')
-    features = ArrayField(models.CharField(max_length=150,
-                          verbose_name='Feature'), blank=True, null=True,
-                          verbose_name='Features')
-    color = models.CharField(max_length=50, blank=True,
-                             verbose_name='Color')
+    description = models.TextField(max_length=2500, null=True, blank=True)
+    price = models.DecimalField(max_digits=9, decimal_places=2)
+    image = models.ImageField(default='ProductDefault.webp')
+    sku = models.CharField('Stock Keeping Unit', max_length=20, unique=True,
+                           null=True, blank=True)
+    features = ArrayField(models.CharField('Feature', max_length=150),
+                          blank=True, null=True)
+    color = models.CharField(max_length=50, blank=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, null=True,
-                                 blank=True, verbose_name='Weight')
-    added = models.DateField(auto_now_add=True, blank=True,
-                             verbose_name='Date added')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE,
-                                 verbose_name='Category')
-    # TODO: Add logic for field.
-    quantity_sold = models.PositiveIntegerField(default=0,
-                                                verbose_name='Quantity sold')
+                                 blank=True)
+    added = models.DateField('Date added', auto_now_add=True, blank=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
                       
     class Meta:
         abstract = True
@@ -100,12 +86,9 @@ class Item(models.Model):
 class GunItem(Item):
 
     category_parent = 'Airsoft Guns'
-    power_source = models.CharField(max_length=20, null=True, blank=True,
-                                    verbose_name='Power source')
-    muzzle_velocity = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name='Muzzle velocity')
-    magazine_capacity = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name='Magazine capacity')
+    power_source = models.CharField(max_length=20, null=True, blank=True)
+    muzzle_velocity = models.PositiveIntegerField(blank=True, null=True)
+    magazine_capacity = models.PositiveIntegerField(blank=True, null=True)
 
     class Meta:
         verbose_name = 'Gun'
@@ -115,9 +98,8 @@ class GunItem(Item):
 class AmmoItem(Item):
 
     category_parent = 'BBS & Pellets'
-    quantity = models.PositiveIntegerField(verbose_name='Quantity')
-    diameter = models.DecimalField(max_digits=5, decimal_places=2, 
-                                   verbose_name='Diameter')
+    quantity = models.PositiveIntegerField()
+    diameter = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
         verbose_name = 'Ammunition'
@@ -152,7 +134,7 @@ CATEGORY_MODEL = {
 class LatestItemManager:
     """Manager gets all existing items.
 
-    TODO: Rid of this class.
+    TODO: Get rid of this class.
 
     """
     @staticmethod
@@ -168,13 +150,13 @@ class CartItem(models.Model):
 
     """
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE,
-                             related_name='related_item', verbose_name='Cart')
+                             verbose_name='Cart')
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
-    quantity = models.PositiveIntegerField(default=1, verbose_name='Quantity')
-    total_price = models.DecimalField(max_digits=9, decimal_places=2,
-                                      verbose_name='Total price')
+    quantity = models.PositiveIntegerField('Quantity', default=1)
+    total_price = models.DecimalField('Total price', max_digits=9,
+                                      decimal_places=2)
       
     def __str__(self):
         return 'Item: {} (in cart)'.format(self.content_object.title)
@@ -189,82 +171,41 @@ class Cart(models.Model):
 
     """
     owner = models.ForeignKey('Customer', on_delete=models.CASCADE,
-                              verbose_name='Owner')
-    items = models.ManyToManyField(CartItem, blank=True,
-                                   related_name='related_cart',
-                                   verbose_name='Items')
-    total_items = models.PositiveIntegerField(default=0,
-                                              verbose_name='Total items')
+                              null=True)
+    total_items = models.PositiveIntegerField(default=0)
     total_price = models.DecimalField(max_digits=9, decimal_places=2,
-                                      default=0, verbose_name='Total price')
+                                      default=0)
     in_order = models.BooleanField(default=False)
 
     def __str__(self):
         return 'Cart: {}'.format(self.id)
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            cart_data = self.items.aggregate(models.Sum('total_price'),
-                                             models.Count('id'))
-            total_price = cart_data['total_price__sum']
-            if not total_price:
-                total_price = 0
-            self.total_price = total_price
-            self.total_items = cart_data['id__count']
+        cart_items = CartItem.objects.filter(cart=self)
+        cart_data = cart_items.aggregate(models.Sum('total_price'),
+                                         models.Sum('quantity'))
+        if cart_data['total_price__sum']:
+            self.total_price = cart_data['total_price__sum']
+            self.total_items = cart_data['quantity__sum']
+        else:
+            self.total_price, self.total_items = 0, 0
         super().save(*args, **kwargs)
 
 
-class UserProfile(models.Model):
+class Customer(models.Model):
     """Profile of registered client of the store.
 
     """
-    user = models.OneToOneField(User,  on_delete=models.CASCADE,
-                                related_name='user', verbose_name='User')
-    phone = models.CharField(max_length=20, null=True, blank=True,
-                             verbose_name='Phone')
-    address = models.CharField(max_length=1024, null=True, blank=True,
-                               verbose_name='Address')
-    orders = models.ManyToManyField('Order', related_name='related_customer',
-                                    verbose_name='Orders')
+    user = models.OneToOneField(User,  on_delete=models.CASCADE)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    address = models.CharField(max_length=1024, null=True, blank=True)
 
     def __str__(self):
         return 'User: {}'.format(self.user.username)
 
 
-def create_profile(sender, **kwargs):
-    user = kwargs['instance']
-    if kwargs['created']:
-        user_profile = UserProfile(user=user)
-        user_profile.save()
-post_save.connect(create_profile, sender=User)
-
-
-# TODO: max_length = ~32; set expire
-class AnonymousUser(models.Model):
-    """Represents anonymous users.
-
-    Helps attach a cart to a non-registered user.
-
-    """
-    identifier = models.UUIDField(verbose_name='Identifier')
-    expire = models.DateField(auto_now_add=True, verbose_name='Expire')
-
-    def __str__(self):
-        return 'Anonymous user {}'.format(self.identifier)
-
-
-class Customer(models.Model):
-    """Represents any customer on the site (registered or not).
-
-    """
-    registered = models.OneToOneField(User, null=True,
-                                      on_delete=models.CASCADE)
-    anonymous = models.OneToOneField(AnonymousUser, null=True,
-                                     on_delete=models.CASCADE)
-
-
 class Order(models.Model):
-    """Represents a client's order of list of products.
+    """Represents a client's order of products.
 
     """
     STATUS_NEW = 'new'
@@ -287,29 +228,20 @@ class Order(models.Model):
         (BUYING_TYPE_DELIVERY, 'Delivery')
     )
 
-    customer = models.ForeignKey(
-        Customer, on_delete=models.CASCADE, related_name='related_orders',
-        verbose_name='Customer'
-    )
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE,
-                             verbose_name='Cart', null=True)
-    first_name = models.CharField(max_length=255, verbose_name='First name')
-    last_name = models.CharField(max_length=255, verbose_name='Last name')
-    phone = models.CharField(max_length=20, verbose_name='Phone')
-    address = models.CharField(max_length=1024, verbose_name='Address',
-                               null=True, blank=True)
-    status = models.CharField(max_length=100, verbose_name='Status',
-                              choices=STATUS_CHOICES, default=STATUS_NEW)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20)
+    address = models.CharField(max_length=1024, null=True, blank=True)
+    status = models.CharField(max_length=100, choices=STATUS_CHOICES,
+                              default=STATUS_NEW)
     buying_type = models.CharField(
-        max_length=100, verbose_name='Buying type', choices=BUYING_TYPE_CHOICE,
-        default=BUYING_TYPE_SELF
+        max_length=100, choices=BUYING_TYPE_CHOICE, default=BUYING_TYPE_SELF
     )
-    comment = models.TextField(max_length=3000, null=True, blank=True,
-                               verbose_name='Comment')
-    created_at = models.DateTimeField(auto_now_add=True,
-                                      verbose_name='Creation date')
-    receiving_date = models.DateField(verbose_name='Receiving date', null=True,
-                                      editable=False)
+    comment = models.TextField(max_length=3000, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    receiving_date = models.DateField(null=True, editable=False)
 
     def __str__(self):
         return '{} | {}'.format(self.id, self.customer)

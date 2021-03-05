@@ -8,7 +8,7 @@
 <div class="container">
     <div class="row">
 
-    {% if cart.items.count %}
+    {% if cart_items|length %}
       <h2 class="text-center mt-5 mb-5 fw-bold">Your Cart</h2>
       <table class="table">
         {% if messages %}
@@ -32,7 +32,7 @@
           </tr>
         </thead>
         <tbody>
-        {% for item in cart.items.all %}
+        {% for item in cart_items %}
           <tr style="height: 160px;">
             <th scope="row">{{item.content_object.title}}</th>
             <td class="w-25" ><img src="{{item.content_object.image.url}}" class="img-fluid" style="object-fit: contain; max-height: 160px;" /></td>

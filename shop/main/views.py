@@ -1,16 +1,5 @@
 """Views of the main application.
 
-Many of views use `request.initial_data` dict.
-This dictionary may store:
-    customer (Customer) - a current customer.
-    cart (Cart) - a current customer's cart.
-    item (Item subclass) - an item taken by an url query.
-    cart_item (CartItem) - a cart item gotten from the database
-                           by an item or created.
-Note that a customer and a cart available everywhere (initializing in
-middleware), but `item` and `cart_item` available only by using
-decorators from the module - `.utils`.
-
 TODO:
     * Fix a bug with double message appearance.
 
@@ -32,13 +21,14 @@ from django.urls import reverse, reverse_lazy
 from .forms import OrderForm
 from .models import (
     Cart,
+    CartItem,
     Category,
     Customer,
     CATEGORY_MODEL,
     LatestItemManager,
     Order
 )
-from .utils import free_anonymous, get_cart_item, get_item
+from .utils import get_cart_item, get_item, set_cookie
 
 
 def index(request):
@@ -47,11 +37,10 @@ def index(request):
     return TemplateResponse(request, 'index.html', {'items': items})
 
 
-@get_item
-def item_details(request):
+def item_details(request, category_slug, item_slug):
     """Renders an item details page."""
-    context = {'item': request.initial_data['item']['object']}
-    return TemplateResponse(request, 'item_details.html', context)
+    item = get_item(category_slug, item_slug)['object']
+    return TemplateResponse(request, 'item_details.html', {'item': item})
 
 
 # TODO: Read `mptt` docs and find out a better way to filter items.
@@ -62,7 +51,7 @@ def items_category(request, category_slug):
     model = CATEGORY_MODEL[root_category.name]
     categories = list(category.get_children())
     categories.append(category)
-    conditions = reduce(operator.or_, [Q(**{"category": category})
+    conditions = reduce(operator.or_, [Q(**{'category': category})
                                        for category in categories])
     items = model.objects.filter(conditions)
     context = {'category': category, 'items': items}
@@ -71,30 +60,30 @@ def items_category(request, category_slug):
 
 def customer_cart(request):
     """Renders a page of a customer's cart."""
-    return TemplateResponse(request, 'customer_cart.html', {})
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    context = {'cart_items': CartItem.objects.filter(cart=cart)}
+    return TemplateResponse(request, 'customer_cart.html', context)
 
 
-@get_cart_item
-def add_to_cart(request):
+def add_to_cart(request, category_slug, item_slug):
     """Adds a ``CartItem`` instance to a cart."""
-    cart = request.initial_data['cart']
-    cart_item, created = request.initial_data['cart_item'].values()
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    cart_item = get_cart_item(request, category_slug, item_slug)
+    cart_item, created = cart_item.values()
     if created:
-        cart.items.add(cart_item)
+        cart_item.cart = cart
     else:
         cart_item.quantity += 1
-        cart_item.save()
+    cart_item.save()
     cart.save()
     messages.info(request, 'Product added successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
-@get_cart_item
-def delete_from_cart(request):
+def delete_from_cart(request, category_slug, item_slug):
     """Deletes a ``CartItem`` instance from a cart."""
-    cart = request.initial_data['cart']
-    cart_item, created = request.initial_data['cart_item'].values()
-    cart.items.remove(cart_item)
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    cart_item = get_cart_item(request, category_slug, item_slug)['object']
     cart_item.delete()
     cart.save()
     messages.info(request, 'Product deleted successfully.')
@@ -103,21 +92,23 @@ def delete_from_cart(request):
 
 def clear_cart(request):
     """Deletes all cart items from a cart."""
-    cart = request.initial_data['cart']
-    for cart_item in cart.items.all():
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    cart_items = CartItem.objects.filter(cart=cart)
+    for cart_item in cart_items:
         cart_item.delete()
+    cart.save()
     messages.info(request, 'The cart cleared successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
 
 # TODO: Sort cart items in a cart with respect to a item's title.
-@get_cart_item
-def change_cart_item_quantity(request):
+def change_cart_item_quantity(request, category_slug, item_slug):
     """Changes quantity of items in a ``CartItem`` instance."""
-    cart_item, created = request.initial_data['cart_item'].values()
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    cart_item = get_cart_item(request, category_slug, item_slug)['object']
     cart_item.quantity = int(request.POST.get('cart_item_quantity', 1))
-    cart_item.save()
-    cart_item.save(update_fields=['quantity'])
+    cart_item.save(update_fields=['quantity', 'total_price'])
+    cart.save()
     messages.info(request, 'Quantity changed successfully.')
     return HttpResponseRedirect(reverse_lazy('customer_cart'))
 
@@ -127,62 +118,69 @@ def change_cart_item_quantity(request):
 def make_order(request):
     """Handles an order page and POST request.
 
-    GET method: renders an order table and an order form.
+    GET method: renders an order table and order form.
     POST method: validates a filled form and creates an order.
 
     """
+    cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
     if request.method == 'POST':
-        order = Order(customer=request.initial_data['customer'])
+        customer = Customer.objects.get(user=request.user)
+        order = Order(customer=customer)
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
             order = form.save()
-            cart = request.initial_data['cart']
             order.cart = cart
             cart.in_order = True
             cart.save(update_fields=["in_order"])
-            order.save(update_fields=["cart"])
-            request.initial_data['customer'].orders.add(order)
+            order.save()
+            new_cart = Cart.objects.create(owner=customer)
+            response = HttpResponseRedirect(reverse('index'))
+            set_cookie(response, 'cart_id', new_cart.pk)
             messages.info(request, 'Order was added successfully.')
             return HttpResponseRedirect(reverse('index'))
     else:
-        form = OrderForm()
-    return TemplateResponse(request, 'checkout.html', {'form': form})
+        cart_items = CartItem.objects.filter(cart=cart)
+        context = {'form': OrderForm(), 'cart': cart, 'cart_items': cart_items}
+    return TemplateResponse(request, 'checkout.html', context)
 
 
-@free_anonymous
 @transaction.atomic
 def signup(request):
+    """Handles an user registration page."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            response = HttpResponseRedirect(reverse('index'))
             user = form.save()
-            customer = Customer.objects.create(registered=user)
-            cart = Cart.objects.create(owner=customer)
-            response.cart = cart
+            customer = Customer.objects.create(user=user)
+            cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+            cart.owner = customer
+            cart.save(update_fields=['owner'])
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return response
+            return HttpResponseRedirect(reverse('index'))
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
 
 
-@free_anonymous
 @transaction.atomic
 def signin(request):
+    """Handles a login page."""
     if request.method == 'POST':
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
-            response = HttpResponseRedirect(reverse('index'))
             username = form.cleaned_data.get('username')
             raw_password = form.cleaned_data.get('password')
             user = authenticate(username=username, password=raw_password)
-            customer = Customer.objects.get(registered=user)
+            anon_cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+            customer = Customer.objects.get(user=user)
             cart = Cart.objects.get(owner=customer, in_order=False)
-            response.cart = cart
+            if anon_cart != cart:
+                anon_cart.delete()
+            response = HttpResponseRedirect(reverse('index'))
+            set_cookie(response, 'cart_id', cart.pk)
             login(request, user)
             return response
     else:
