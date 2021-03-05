@@ -6,7 +6,6 @@ from .models import (
     Category,
     GearItem,
     GunItem,
-    Order,
 )
 
 
@@ -28,11 +27,3 @@ GunItemForm = forms.modelform_factory(GunItem, form=ItemForm)
 GearItemForm = forms.modelform_factory(GearItem, form=ItemForm)
 AmmoItemForm = forms.modelform_factory(AmmoItem, form=ItemForm)
 AccessoryItemForm = forms.modelform_factory(AccessoryItem, form=ItemForm)
-
-
-class OrderForm(forms.ModelForm):
-
-    class Meta:
-        model = Order
-        fields = ('first_name', 'last_name', 'phone', 'address', 'buying_type',
-                  'comment')

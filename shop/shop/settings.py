@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     
     'main.apps.MainConfig',
-    'user.apps.UserConfig'
+    'shopping.apps.ShoppingConfig',
+    'user.apps.UserConfig',
 ]
 
 MIDDLEWARE = [
@@ -40,7 +41,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'main.middleware.CategoryMiddleware',
-    'main.middleware.ShoppingCartMiddleware',
+    'shopping.middleware.ShoppingCartMiddleware',
 ]
 
 ROOT_URLCONF = 'shop.urls'

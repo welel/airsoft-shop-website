@@ -7,8 +7,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import Customer
-from main.models import Cart
-from main.utils import set_cookie
+from shopping.models import Cart
+from shopping.utils import set_cookie
 
 
 @transaction.atomic

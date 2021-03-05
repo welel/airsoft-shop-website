@@ -6,12 +6,8 @@ import datetime
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 
-from .models import (
-    Cart,
-    CartItem,
-    Category,
-    CATEGORY_MODEL,
-)
+from main.models import Category, CATEGORY_MODEL
+from shopping.models import Cart, CartItem
 
 
 def get_item(category_slug: str, item_slug: str) -> dict:
