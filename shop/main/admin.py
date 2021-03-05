@@ -6,13 +6,9 @@ from .forms import AccessoryItemForm, AmmoItemForm, GearItemForm, GunItemForm
 from .models import (
     AccessoryItem,
     AmmoItem,
-    Cart,
-    CartItem,
     Category,
-    Customer,
     GearItem,
     GunItem,
-    Order
 )
 
 
@@ -37,7 +33,3 @@ admin.site.register(GunItem, GunItemAdmin)
 admin.site.register(AmmoItem, AmmoItemAdmin)
 admin.site.register(GearItem, GearItemAdmin)
 admin.site.register(AccessoryItem, AccessoryItemAdmin)
-admin.site.register(CartItem)
-admin.site.register(Cart)
-admin.site.register(Customer)
-admin.site.register(Order)
