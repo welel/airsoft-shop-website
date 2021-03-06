@@ -2,11 +2,13 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import transaction
+from django.forms.models import inlineformset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Customer
+from .forms import UserForm
+from .models import Customer, User
 from shopping.models import Cart
 from shopping.utils import set_cookie
 
@@ -18,7 +20,7 @@ def signup(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            customer = Customer.objects.create(user=user)
+            customer = Customer.objects.get(user=user)
             cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
             cart.owner = customer
             cart.save(update_fields=['owner'])
@@ -26,7 +28,7 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('edit_user'))
     else:
         form = UserCreationForm()
     return render(request, 'signup.html', {'form': form})
@@ -59,3 +61,33 @@ def signin(request):
 def logout_(request):
     logout(request)
     return HttpResponseRedirect(reverse('index'))
+
+
+@login_required()
+def edit_user(request):
+    user = request.user
+    user_form = UserForm(instance=user)
+
+    ProfileInlineFormset = inlineformset_factory(
+        User, Customer, fields=('phone', 'address')
+    )
+    formset = ProfileInlineFormset(instance=user)
+
+    if request.method == "POST":
+        user_form = UserForm(request.POST, instance=user)
+        formset = ProfileInlineFormset(request.POST, instance=user)
+
+        if user_form.is_valid():
+            created_user = user_form.save(commit=False)
+            formset = ProfileInlineFormset(request.POST, instance=created_user)
+
+            if formset.is_valid():
+                created_user.save()
+                formset.save()
+                return HttpResponseRedirect(reverse('index'))
+
+    return render(request, "edit_user.html", {
+        "noodle": user.pk,
+        "noodle_form": user_form,
+        "formset": formset,
+    })
