@@ -1,10 +1,9 @@
 __pycache__/
 *.pyc
 migrations/
-*.ini
 env/
 .env
 dev_sources/
 .idea
 media/
-initial_data/
+dev/

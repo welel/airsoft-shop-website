@@ -27,7 +27,7 @@ class Category(MPTTModel):
         order_insertion_by = ['name']
 
     def save(self, *args, **kwargs):
-        slug = slugify(self.title, allow_unicode=True)
+        slug = slugify(self.name, allow_unicode=True)
         if not self.slug or self.slug != slug:
             self.slug = slug
         super().save(*args, **kwargs)

@@ -1,0 +1,5 @@
+Thank you for registration in AirSoft Shop!
+You need to confirm your email. To do this follow the link, please:
+{{host}}{% url 'register_activate' sign=sign %}
+
+Welcome to AirSoft Shop and enjoy your visit!
