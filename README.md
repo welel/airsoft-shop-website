@@ -2,7 +2,7 @@
 
 This is an e-commerce website of airsoft guns and equipment.
 
-![](details/overview.gif)
+![](https://s4.gifyu.com/images/ezgif.com-gif-makerddf3b77a6efc5794.gif)
 
 
 
@@ -20,8 +20,6 @@ This is an e-commerce website of airsoft guns and equipment.
 
 2. Clone repository.
    
-3. Install requirements.
-
 4. Create virtual environment and activate it.
 
 5. Install requirements from the file.
@@ -30,8 +28,22 @@ This is an e-commerce website of airsoft guns and equipment.
 
    > Note: Ubuntu requires `libpq-dev` and `python-dev` before installation.
 
-6. Fill and rename `.env_sample`.
+6. Fill `.env_sample` with required data and rename the file to `.env`.
 
 7. Make migrations.
 
 8. Run the server `python3 manage.py runserver`.
+
+
+
+# Implemented
+
+* Products
+* Product Categories (tree structure)
+* Cart
+* Cart for Anonymous User (using Cookie)
+* Customer
+* Registration
+* Email confirmation of registration
+* Edit profile
+* Order procedure 
