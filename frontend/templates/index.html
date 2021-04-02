@@ -16,9 +16,9 @@
         {% for category in categories %}
           <div class="col">
             <div class="card">
-              <img src="..." class="card-img-top" alt="...">
+              <img src="{{ category.image.url }}" class="card-img-top" alt="Category image" style="height=300px; width: 100%;" />
               <div class="card-body">
-                <h5 class="card-title"><a class="link-dark" href="{{category.get_absolute_url}}">{{category}}</a></h5>
+                <h3 class="card-title"><a class="link-dark" href="{{ category.get_absolute_url }}">{{category}}</a></h3>
                 <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
               </div>
             </div>

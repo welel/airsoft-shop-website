@@ -40,6 +40,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
     'main.middleware.CategoryMiddleware',
     'shopping.middleware.ShoppingCartMiddleware',
 ]
@@ -93,23 +94,25 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 STATIC_URL = '/static/'
-
 STATICFILES_DIRS = [
     PROJECT_DIR.joinpath('frontend/static'),
 ]
 
 MEDIA_URL = '/media/'
-
 MEDIA_ROOT = PROJECT_DIR.joinpath('frontend/media')
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
+EMAIL_PORT = 465
