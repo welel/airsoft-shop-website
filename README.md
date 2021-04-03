@@ -1,8 +1,10 @@
-# Airsoft Shop Website
+<h1 align="center">Airsoft Shop Website</h1>
 
-This is an e-commerce website of airsoft guns and equipment.
+<p align="center">This is an e-commerce website of airsoft guns and equipment.</p>
 
-![](https://s4.gifyu.com/images/ezgif.com-gif-makerddf3b77a6efc5794.gif)
+<p align="center">
+   <img alt="hi" src="https://s4.gifyu.com/images/ezgif.com-gif-maker-1b64c12be4b6285c3.gif" align="center"/>
+</p>
 
 
 
