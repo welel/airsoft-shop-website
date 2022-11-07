@@ -7,6 +7,7 @@
 
 <div class="container mt-5">
     <h1 id="products" class="text-center text-uppercase fw-bold">Orders</h1>
+      {% if orders %}
       {% for order in orders %}
         <p class="mt-4">
             <button class="btn btn-warning" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample{{ order.id }}" aria-expanded="false" aria-controls="collapseExample">
@@ -53,6 +54,11 @@
             </div>
         </div>
       {% endfor %}
+      {% else %}
+      <p class="mt-5 fs-3">
+        You don't have orders, go to <a class="text-warning" href="{% url 'index' %}">showcase.</a>
+      </p>
+      {% endif %}
 </div>
 
 {% endblock %}
