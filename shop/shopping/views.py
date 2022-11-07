@@ -3,11 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
+from django.views.generic import ListView
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 
-from .forms import OrderForm
-from .models import Cart, CartItem, Order
-from .utils import get_cart_item, set_cookie
+from shopping.forms import OrderForm
+from shopping.models import Cart, CartItem, Order
+from shopping.utils import get_cart_item, set_cookie
 from user.models import Customer
 
 
@@ -76,8 +78,8 @@ def make_order(request):
 
     """
     cart = Cart.objects.get(pk=request.COOKIES['cart_id'])
+    customer = Customer.objects.get(user=request.user)
     if request.method == 'POST':
-        customer = Customer.objects.get(user=request.user)
         order = Order(customer=customer)
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
@@ -93,5 +95,26 @@ def make_order(request):
             return HttpResponseRedirect(reverse('index'))
     else:
         cart_items = CartItem.objects.filter(cart=cart)
-        context = {'form': OrderForm(), 'cart': cart, 'cart_items': cart_items}
+        initial = {'first_name': request.user.first_name,
+                   'last_name': request.user.last_name,
+                   'phone': customer.phone,
+                   'address': customer.address}
+        form = OrderForm(initial=initial)
+        context = {'form': form, 'cart': cart, 'cart_items': cart_items}
     return TemplateResponse(request, 'checkout.html', context)
+
+
+@method_decorator(login_required, name='dispatch')
+class OrderList(ListView):
+    model = Order
+    template_name = 'orders_list.html'
+    context_object_name = 'orders'
+
+    def get_queryset(self):
+        customer = Customer.objects.get(user=self.request.user)
+        orders = Order.objects.filter(customer=customer)
+        for i, order in enumerate(orders):
+            cart = order.cart
+            cart_items = CartItem.objects.filter(cart=cart)
+            orders[i].order_items = cart_items
+        return orders

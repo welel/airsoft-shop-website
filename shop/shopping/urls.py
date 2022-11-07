@@ -7,6 +7,7 @@ from .views import (
     customer_cart,
     delete_from_cart,
     make_order,
+    OrderList,
 )
 
 
@@ -20,4 +21,5 @@ urlpatterns = [
     path('checkout/', make_order, name='checkout'),
     path('change_qty/<str:category_slug>/<str:item_slug>/',
          change_cart_item_quantity, name='change_cart_item_quantity'),
+    path('orders/', OrderList.as_view(), name='orders_list'),      
 ]

@@ -35,8 +35,9 @@
             {% endwith %}
           </a>
           <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
-            <li><a class="dropdown-item" href="#">Orders</a></li>
+            <li><a class="dropdown-item" href="{% url 'orders_list' %}">Orders</a></li>
             <li><a class="dropdown-item" href="{% url 'edit_user' %}">Edit profile</a></li>
+            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
           </ul>
         </li>
