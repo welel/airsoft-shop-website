@@ -119,4 +119,5 @@ def user_activate(request, sign):
         template = 'user/activation_done.html'
         user.is_active = True
         user.save()
+        login(request, user)
     return render(request, template)

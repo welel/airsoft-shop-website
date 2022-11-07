@@ -28,10 +28,17 @@
           </a>
     {% if user.is_authenticated %}
         </li>
-          <li class="nav-item">
-          <a href="{% url 'logout' %}" class="nav-link text-white fw-bolder">
-            Logout
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% with user=request.user %}
+              {% firstof user.first_name user.last_name user.email %}
+            {% endwith %}
           </a>
+          <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink">
+            <li><a class="dropdown-item" href="#">Orders</a></li>
+            <li><a class="dropdown-item" href="{% url 'edit_user' %}">Edit profile</a></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+          </ul>
         </li>
     {% else %}
           </li>

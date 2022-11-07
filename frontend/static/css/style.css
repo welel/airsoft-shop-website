@@ -73,3 +73,18 @@
     position: relative;
     color: white;
 }
+
+.msgs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+}
+@media screen and (max-width: 300px) {
+    .msgs {
+        position: relative;
+        width: 100%;
+        z-index: 2;
+    }
+}

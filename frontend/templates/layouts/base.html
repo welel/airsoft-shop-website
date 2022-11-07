@@ -16,6 +16,18 @@
 
 <body>
 	{% include 'layouts/header.html' %}
+
+	{% if messages %}
+		{% for message in messages %}
+		<div class="alert alert-success alert-dismissible fade show msgs" role="alert">
+			<strong>
+				{{message}}
+			</strong>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endfor %}
+	{% endif %}
+
 	{% block main %}{% endblock %}
 	{% include 'layouts/footer.html' %}
 	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js" integrity="sha384-q2kxQ16AaE6UbzuKqyBE9/u/KzioAlnx2maXQHiDX9d4/zp8Ok3f+M7DPm+Ib6IU" crossorigin="anonymous"></script>

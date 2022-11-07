@@ -30,7 +30,7 @@ def add_to_cart(request, category_slug, item_slug):
     cart_item.save()
     cart.save()
     messages.info(request, 'Product added successfully.')
-    return HttpResponseRedirect(reverse_lazy('customer_cart'))
+    return HttpResponseRedirect(reverse_lazy('index') + '#products')
 
 
 def delete_from_cart(request, category_slug, item_slug):

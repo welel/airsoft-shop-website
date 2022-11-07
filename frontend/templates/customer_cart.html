@@ -34,7 +34,7 @@
         <tbody>
         {% for item in cart_items %}
           <tr style="height: 160px;">
-            <th scope="row">{{item.content_object.title}}</th>
+            <th scope="row"><a class="link-warning" href="{{item.content_object.get_absolute_url}}">{{item.content_object.title}}</a></th>
             <td class="w-25" ><img src="{{item.content_object.image.url}}" class="img-fluid" style="object-fit: contain; max-height: 160px;" /></td>
             <td>{{item.content_object.price}} $</td>
             <td>
