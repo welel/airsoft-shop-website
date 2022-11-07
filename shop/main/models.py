@@ -21,7 +21,8 @@ class Category(MPTTModel):
                             verbose_name='Category name')
     slug = models.SlugField(unique=True, max_length=200, editable=False)
     description = models.TextField(max_length=2500, null=True, blank=True)
-    image = models.ImageField(default='images/ProductDefault.png', upload_to=f'images/categories/')
+    image = models.ImageField(default='images/ProductDefault.png',
+                upload_to=f'images/categories/')
     
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -59,7 +60,8 @@ class Item(models.Model):
                                  blank=True)
     added = models.DateField('Date added', auto_now_add=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    image = models.ImageField(default='images/ProductDefault.png', upload_to=f'images/items/')
+    image = models.ImageField(default='images/ProductDefault.png',
+                upload_to=f'images/items/')
                       
     class Meta:
         abstract = True

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'main.apps.MainConfig',
     'shopping.apps.ShoppingConfig',
     'user.apps.UserConfig',
+    'search.apps.SearchConfig',
 ]
 
 MIDDLEWARE = [

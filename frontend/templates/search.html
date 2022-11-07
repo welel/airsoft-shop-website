@@ -1,0 +1,35 @@
+<!-- TODO: Fix cart (doen't dispaly counter). -->
+
+{% extends 'layouts/base.html' %}
+
+{% load static %}
+
+{% block main %}
+<div class="content-top mt-5">
+	<h1 class="text-center text-uppercase fw-bold">Search results</h1>
+    <hr>
+    {% with results_number=results|length %}
+        {% if results_number %}
+            <p class="text-center fs-5">Search finished, found <b>{{ results_number }}</b> procuct{{ results_number|pluralize }}.</p>
+        {% else %}
+            <p class="text-center fs-5">Sorry, we couldn't find any procucts for your search query.</p>
+        {% endif %}
+    {% endwith %}
+    <ul class="mt-3">
+		{% for item in results %}
+			<li class="box mt-5">
+				<div class="slide-img">
+					<img src="{{ item.image.url }}">
+				</div>
+				<div class="box-overlay">
+					<a href="{% url 'add_to_cart' category_slug=item.category.slug item_slug=item.slug %}" class="buy-btn">Add to Card</a>
+				</div>
+				<div class="detail-box">
+					<a class="item-title" href="{{item.get_absolute_url}}" class="item-title">{{ item.title }}</a>
+					<h1 class="item-price"><b>${{ item.price }}</b></h1>
+				</div>
+			</li>
+		{% endfor %}
+	</ul>
+</div>
+{% endblock %}

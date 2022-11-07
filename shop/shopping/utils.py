@@ -11,7 +11,11 @@ from shopping.models import Cart, CartItem
 
 
 def get_item(category_slug: str, item_slug: str) -> dict:
-    """Gets a ``Item`` instance from database."""
+    """Gets a ``Item`` instance from database.
+    
+    TODO: Why is it here?
+
+    """
     root_category = get_object_or_404(Category, slug=category_slug)
     model = CATEGORY_MODEL[root_category.get_root().name]
     item = get_object_or_404(model, slug=item_slug)
