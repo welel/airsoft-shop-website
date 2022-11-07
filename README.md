@@ -40,6 +40,8 @@
 
 9. Run the server `python manage.py runserver`.
 
+   If you get errors try to delete Cookies for `127.0.0.1` and `localhost` in your browser.
+
 
 
 # Implemented

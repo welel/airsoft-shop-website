@@ -1,0 +1,393 @@
+[
+{
+  "model": "main.category",
+  "pk": 1,
+  "fields": {
+    "parent": null,
+    "name": "Airsoft Guns",
+    "slug": "airsoft-guns",
+    "description": "Airsoft guns are replica toy guns used in airsoft sports. They are a special type of low-power smoothbore air guns designed to shoot non-metallic spherical projectiles (pb) often colloquially (but incorrectly) referred to as \"BBs\", which are typically made of (but not limited to) plastic or biodegradable resin materials. Airsoft gun powerplants are designed to have low muzzle energy ratings (generally less than 1.5 J, or 1.1 ft⋅lb) and the pellets have significantly less penetrative and stopping powers than conventional airguns, and are generally safe for competitive sporting and recreational purposes if proper protective gear is worn.",
+    "image": "images/categories/nastol.com.ua-277154.jpg",
+    "lft": 1,
+    "rght": 8,
+    "tree_id": 2,
+    "level": 0
+  }
+},
+{
+  "model": "main.category",
+  "pk": 2,
+  "fields": {
+    "parent": null,
+    "name": "BBS & Pellets",
+    "slug": "bbs-pellets",
+    "description": "Airsoft pellets are spherical projectiles used by airsoft guns. Typically made of plastic, they usually measure around 6 mm (0.24 in) in diameter (though selective models use 8 mm), and weigh 0.12–0.40 g (1.9–6.2 gr), with the most common weights being 0.12 g and 0.20 g, while 0.25 g, 0.28 g, 0.30 g and 0.40 g pellets are also commonplace. Though frequently referred to as \"BBs\" among airsoft users, these pellets are not the same as either of the 4.5 mm metal projectiles that BB guns fire, or the 4.6 mm (0.180 in)-sized birdshot from which the term \"BB\" originated.",
+    "image": "images/categories/KINGBALL-KULKI-ASG-AMUNICJA-6mm-500szt-0-12g-0973.jpeg",
+    "lft": 1,
+    "rght": 4,
+    "tree_id": 3,
+    "level": 0
+  }
+},
+{
+  "model": "main.category",
+  "pk": 3,
+  "fields": {
+    "parent": null,
+    "name": "Tactical Gear",
+    "slug": "tactical-gear",
+    "description": "It is amazing how pieces of tech gear started off being used by the military and ended up in the hands of civilians. Small-wonder tactical gear is so in demand by civilians, and it can be affordable while being robust and durable.\r\n\r\nThe clothes are comfortable, durable, and lightweight. Additionally, the many different types of gear and accessories can endure aggressive wear and tear. They all provide you with a sense of safety while also being functional, and yes, very fashionable too.",
+    "image": "images/categories/IMGP6935b.jpg",
+    "lft": 1,
+    "rght": 6,
+    "tree_id": 5,
+    "level": 0
+  }
+},
+{
+  "model": "main.category",
+  "pk": 4,
+  "fields": {
+    "parent": null,
+    "name": "Accessories",
+    "slug": "accessories",
+    "description": "Find a wide selection of airsoft gun accessories including scopes, red dot sights, magazines, grenade launchers, foregrips & more at Airsoft Station.",
+    "image": "images/categories/Quick-Release-1-30-11-21.jpg",
+    "lft": 1,
+    "rght": 4,
+    "tree_id": 1,
+    "level": 0
+  }
+},
+{
+  "model": "main.category",
+  "pk": 5,
+  "fields": {
+    "parent": 2,
+    "name": "BBC",
+    "slug": "bbc",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 2,
+    "rght": 3,
+    "tree_id": 3,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 7,
+  "fields": {
+    "parent": 3,
+    "name": "Clothes",
+    "slug": "clothes",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 4,
+    "rght": 5,
+    "tree_id": 5,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 8,
+  "fields": {
+    "parent": 3,
+    "name": "Helmets",
+    "slug": "helmets",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 2,
+    "rght": 3,
+    "tree_id": 5,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 9,
+  "fields": {
+    "parent": 4,
+    "name": "Scopes",
+    "slug": "scopes",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 2,
+    "rght": 3,
+    "tree_id": 1,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 10,
+  "fields": {
+    "parent": 1,
+    "name": "Pistols",
+    "slug": "pistols",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 2,
+    "rght": 3,
+    "tree_id": 2,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 11,
+  "fields": {
+    "parent": 1,
+    "name": "Sniper Rifles",
+    "slug": "sniper-rifles",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 6,
+    "rght": 7,
+    "tree_id": 2,
+    "level": 1
+  }
+},
+{
+  "model": "main.category",
+  "pk": 12,
+  "fields": {
+    "parent": 1,
+    "name": "Rifle",
+    "slug": "rifle",
+    "description": "",
+    "image": "images/ProductDefault.png",
+    "lft": 4,
+    "rght": 5,
+    "tree_id": 2,
+    "level": 1
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 1,
+  "fields": {
+    "title": "Hi-Capa 5.1 GBB",
+    "slug": "hi-capa-51-gbb",
+    "description": "Tokyo Marui (TM) Hi-Capa 5.1 GBB.\r\n\r\nThe Hi-Capa 5.1 is very valuable, this pistol offers lots of bang for the buck. It is hands-down the most popular gas blowback pistol of all time - and there is good reason for that! Makes efficient use of HFC134a to pack a wallop not found on other more expensive pistols. Metal parts included : recoil spring guide rod, nickel plated hammer, adjustable rear sight, front sight, magazine catch, magazine, and frame with an ABS grip. The barrel is also handsomely nickel plated. Good for 290fps when using HFC22 TOP Gas! Gun is heavy thanks to the heavy metal frame. Extremely smooth slide cycling action with strong recoil and a pleasant assortment of clicks and clacks when the slide is pulled back makes this gun a lot of fun to shoot.",
+    "price": "179.90",
+    "sku": "TM-142177",
+    "features": "[\"Semi Automatic\", \"Adjustable Hopup\", \"Length: 222mm\"]",
+    "color": "Black",
+    "weight": "0.89",
+    "added": "2022-10-10",
+    "category": 10,
+    "image": "images/items/tokyo-marui-hi-capa-51-gbb.jpg",
+    "power_source": "Gas blowback",
+    "muzzle_velocity": 290,
+    "magazine_capacity": 32
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 2,
+  "fields": {
+    "title": "VFC Glock G19 GBB (Black)",
+    "slug": "vfc-glock-g19-gbb-black",
+    "description": "UMAREX / VFC Glock G19 GBB (Black).\r\n\r\nThe GLOCK 19 is a compact version of the GLOCK 17. The barrel and frame of this airsoft version are shorter, but the licensed replica stands up well next to its big brother. It’s almost exactly as heavy thanks to the heavy metal slide, which considerably enhances the pistol’s feel. The adjustable shoot-up gives the pellets a backspin for stable flight over long distances. And you get a convincing recoil each time a 6-mm pellet leaves the barrel. The GLOCK 19 also likes to show what it’s made of. Take it apart, clean it and put it back together – airsoft fans will enjoy the routine.",
+    "price": "199.90",
+    "sku": "UM-2-6413",
+    "features": "[\"metal slide\", \"Picatinny rail\", \"adjustable Shoot-Up\", \"authentic replica\", \"Shoot-Up key included\"]",
+    "color": "Black",
+    "weight": "0.78",
+    "added": "2022-10-10",
+    "category": 10,
+    "image": "images/items/umarex-vfc-glock-g19-gbb-black.jpg",
+    "power_source": "Gas blowback",
+    "muzzle_velocity": 300,
+    "magazine_capacity": 20
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 3,
+  "fields": {
+    "title": "Well MB4410GA2 Bolt Action Airsoft Sniper Rifle, OD Green",
+    "slug": "well-mb4410ga2-bolt-action-airsoft-sniper-rifle-od-green",
+    "description": "Well MB4410GA2 Bolt Action Airsoft Sniper Rifle, OD Green.",
+    "price": "192.99",
+    "sku": "UK-MB4410GA2",
+    "features": "[\"Manufacture: Well\", \"Material: Aluminum Outer Barrel, Bolt & Fiber Polymer Stock\", \"Trigger: M24/M28 Trigger\", \"Length: 44.25 In. / 35.25 In. (Folded Stock)\", \"Modes: Safety & Fire\", \"Scope: 4-16x50mm Tri-Rail Illuminated Scope w/ Integrated Scope Mount (Rangefinder Reticle)\"]",
+    "color": "OD Green",
+    "weight": "9.25",
+    "added": "2022-10-10",
+    "category": 11,
+    "image": "images/items/well-mb4410ga2-bolt-action-rifle-w-illuminated-scope-od-green__90640.jpg",
+    "power_source": "Spring",
+    "muzzle_velocity": 400,
+    "magazine_capacity": 34
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 4,
+  "fields": {
+    "title": "VSR-10 G-SPEC",
+    "slug": "vsr-10-g-spec",
+    "description": "Tokyo Marui VSR-10 G-SPEC.\r\n\r\nSolid performing sniper rifle delivers good accuracy and power for a very economical price. Plastic stock and metal barrel with removable stylish silencer that actually makes a big difference! Firm cocking action with the metal cocking lever. Best part about this rifle is the recoil felt when firing the gun. Each shot is accompanied by a satisfying solid jolt and \"clunk\". Comes with scope mount that allows easy installation of a targeting system! Front sight mount allows easy installation of a bipod.",
+    "price": "299.90",
+    "sku": "TM-135032",
+    "features": "[\"Adjustable Hopup\", \"Length: 1135mm\", \"Bolt Action\"]",
+    "color": "Black",
+    "weight": "1.15",
+    "added": "2022-10-10",
+    "category": 11,
+    "image": "images/items/tokyo-marui-vsr-10-g-spec.jpg",
+    "power_source": "Spring",
+    "muzzle_velocity": 450,
+    "magazine_capacity": 30
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 5,
+  "fields": {
+    "title": "NEXT-GEN SOPMOD M4",
+    "slug": "next-gen-sopmod-m4",
+    "description": "Tokyo Marui SOPMOD M4 Recoil Shock Next Generation.\r\n\r\nThe electric airsoft gun. Replica of model M4 SOPMOD from Tokyo Marui. The newest processing of airsoft replica from series called Next Generatiom is characterized full-metal design, realistic motion imitation of cocking handle, recoil shock and functional bolt catch in case of empty magazine.",
+    "price": "579.90",
+    "sku": "TM-176035",
+    "features": "[\"Adjustable Hopup\", \"Length: 878mm\"]",
+    "color": "Black",
+    "weight": "3.20",
+    "added": "2022-10-10",
+    "category": 12,
+    "image": "images/items/tokyo-marui-next-gen-sopmod-m4.jpg",
+    "power_source": "Motor: EG1000",
+    "muzzle_velocity": 280,
+    "magazine_capacity": 82
+  }
+},
+{
+  "model": "main.gunitem",
+  "pk": 6,
+  "fields": {
+    "title": "NEXT-GEN SCAR-H (Black)",
+    "slug": "next-gen-scar-h-black",
+    "description": "Tokyo Marui SCAR-H Recoil Shock AEG\r\nAirsoft Replica of SCAR Heavy (U.S. SOCOM MK17 MOD 0) Airsoft Rifle\r\n\r\nOne-piece CNC Aluminum Milled Upper Receiver with authentic laser engraved marking\r\n10 inch (260mm) outer barrel plus tri lug type 140mm flash hider & 110mm Barrel Extension (Able to change the outer barrel from 13inch to 16inch barrel length)\r\nOn top of upper receiver cover by full flat top picatinny rail and tri-rails offer sufficient space for tactical accessories\r\nRobust form & shape reproduce as same weight as real steel (3300g)\r\n\r\nEquipped New Version 2 SHOOT & RECOIL Engine\r\nAmbidextrous safety-fire mode selectors which allows for Semi & Full Automatic Shooting mode\r\nRealistic recoil from each shot\r\n\r\nBolt Locking function which stops the gun from firing after last BB fired (when you reload a loaded magazine back, press bolt release catch and you are ready to fire again)\r\nFull Metal 90 Rounds Loading Capacity 7.62 Style Magazine With Magwell\r\n\r\nPolymer buttstock is adjustable for length of pull, and is shaped to provide positive cheekrest with adjustable cheek support\r\nMarui 8.4V 1300mAh Ni-MH Rechargeable Battery (optional) can store into side-folding stock (Mini Type / Mini Plug)",
+    "price": "649.90",
+    "sku": "TM-176172",
+    "features": "[\"Adjustable Hopup\", \"Length: 902mm\"]",
+    "color": "Black",
+    "weight": "3.63",
+    "added": "2022-10-10",
+    "category": 12,
+    "image": "images/items/tokyo-marui-next-gen-scar-h-black.jpg",
+    "power_source": "Semi + Full Automati",
+    "muzzle_velocity": 290,
+    "magazine_capacity": 90
+  }
+},
+{
+  "model": "main.ammoitem",
+  "pk": 1,
+  "fields": {
+    "title": "0,30g EDGE Bio BB Precision 1kg (White)",
+    "slug": "030g-edge-bio-bb-precision-1kg-white",
+    "description": "Specna Arms® brand known for its quality and innovativeness of produced replicas introduces yet another novelty: precision BBs from the professional EDGE™ series. In the wide array of EDGE™ BBs you will find highest-quality ammunition for ASG replicas manufactured by true experts in terms of precision BBs - Taiwanese BLS.   \r\n\r\nThe diameter of EDGE™ BBs is 5.95 mm (+/- 0.005 mm) and the difference in weight among BBs does not exceed 0.01 g. As a result, Specna Arms® EDGE™ BBs are ideal for standard barrels, while they reach their full potential in precision barrels.\r\n\r\nAt the final stage of production, high-polish is carefully applied to every BB made by Specna Arms®. Afterwards, EDGE™ BBs are laced with a special friction-reducing layer in order to ensure a problem-free cooperation with precision barrels.  This also results in a better cooperation with Hop-Up buckings.\r\n\r\nThanks to a full control over the production process, the manufacturer achieves ideally-spherical BBs without visible cavities or seams. A well-distributed center of gravity combined with a lack of air space inside the BB allow for a very good repeatability of shots.",
+    "price": "19.90",
+    "sku": "SPE-16-027219-00",
+    "features": "[\"high-polish is carefully applied\", \"good repeatability\", \"does not exceed 0.01 g\"]",
+    "color": "White",
+    "weight": "0.30",
+    "added": "2022-10-10",
+    "category": 5,
+    "image": "images/items/specna-arms-030g-edge-bio-bb-precision-1kg-white.jpg",
+    "quantity": 3300,
+    "diameter": "5.95"
+  }
+},
+{
+  "model": "main.ammoitem",
+  "pk": 2,
+  "fields": {
+    "title": "Bio BB 0,25g (Dark Earth)",
+    "slug": "bio-bb-025g-dark-earth",
+    "description": "Xtreme Precision Bio BB 0,25g (Dark Earth) in new, resealable bag!",
+    "price": "13.00",
+    "sku": "BB-XP-025-DE-1",
+    "features": null,
+    "color": "Dark Earth",
+    "weight": "0.25",
+    "added": "2022-10-10",
+    "category": 5,
+    "image": "images/items/xtreme-precision-bio-bb-025g-dark-earth.jpg",
+    "quantity": 1500,
+    "diameter": "5.50"
+  }
+},
+{
+  "model": "main.gearitem",
+  "pk": 1,
+  "fields": {
+    "title": "Ghillie Suit (Digital Woodland)",
+    "slug": "ghillie-suit-digital-woodland",
+    "description": "Helikon Ghillie Suit ( Digital Woodland).\r\n\r\nGhillie Suit consists of four parts: tunic, pants, hat and weapon camouflaging tape. The garments are made out of breathable mesh with user’s silhouette obliterating camouflage attached. Thanks to its design the suit can be worn over the clothes or uniform. Slotted pockets inside tunic and pants allow access to equipment buried beneath the suit. The hat camouflages head and face, protecting it also against insects, and weapon camouflaging tape obliterates the weapon silhouette. Ghillie Suit is meant for scouts, snipers and civilian enthusiasts.",
+    "price": "84.90",
+    "sku": "HT-KP-GHL-PO-07-M",
+    "features": "[\"Highly breathable\", \"Easily compressed and lightweight\", \"Tunic closed with plastic snaps\", \"Slotted lower tunic pockets\", \"Drawstrings in pants waist and leg cuffs\", \"Two slotted pockets in the pants\"]",
+    "color": "Green",
+    "weight": "0.40",
+    "added": "2022-10-10",
+    "category": 7,
+    "image": "images/items/helikon-ghillie-suit-digital-woodland.png"
+  }
+},
+{
+  "model": "main.gearitem",
+  "pk": 2,
+  "fields": {
+    "title": "Lancer Tactical SpecOps Military Style Helmet, PJ Type with Rails and Velcro, Black",
+    "slug": "lancer-tactical-specops-military-style-helmet-pj-type-with-rails-and-velcro-black",
+    "description": "The Lancer Tactical SpecOps Military Style Helmet will make a great addition to any airsoft player's loadout. This helmet has a foam padded interior and fits very comfortably. The straps are fully adjustable to fit snugly under your chin and around the back of your head. Includes slot for NVG mount and side rails for mounting accessories. Whether you're looking for extra protection or just want that tactical look, this high quality helmet is a great choice.",
+    "price": "42.00",
+    "sku": "UK-CA-725B",
+    "features": "[\"Durable ABS plastic\", \"Adjustable straps\", \"Foam lined interior\", \"Slot for NVG Mount\", \"Side Rails\", \"Velcro on top and sides\"]",
+    "color": "Black",
+    "weight": "0.30",
+    "added": "2022-10-10",
+    "category": 8,
+    "image": "images/items/lancer-tactical-specops-military-style-helmet-pj-type-with-rails-and-velcro_PxTtGhW.jpg"
+  }
+},
+{
+  "model": "main.accessoryitem",
+  "pk": 1,
+  "fields": {
+    "title": "Rhino 4x32 Railed Scope",
+    "slug": "rhino-4x32-railed-scope",
+    "description": "A scope by Theta Optics™ is a guarantee of high quality and reasonable price. Enclosed in a durable, metal casing, vivid optics with a Mil-Dot reticle as well as a fixed, 4 times magnification. Thanks to illuminated crosshairs (red, blue or green) the scope can be easily used for operations during the day as well as the night. Powered by a single CR1620 battery. The reticle can be smoothly adjusted both vertically and horizontally. The product is attached on a standard RIS 22 mm rail. \r\n\r\nThe scope is equipped with short RIS rails (3 in total) for the attachment of additional accessories. \r\n\r\nThe purpose of Theta Optics™ is not only the delivery of high-quality optics but also to constantly broaden its offer with innovative solutions encountered in higher-class products. Every model goes through a range of tests prior to being introduced to the market. Theta Optics™ is a proposal for people seeking high quality at reasonable price.",
+    "price": "69.90",
+    "sku": "THO-10-018592-00",
+    "features": "[\"Mil-Dot\", \"illuminated crosshairs\", \"RIS 22 mm rail\", \"high quality\"]",
+    "color": "Black",
+    "weight": "0.15",
+    "added": "2022-10-10",
+    "category": 9,
+    "image": "images/items/theta-optics-rhino-4x32-railed-scope.png"
+  }
+},
+{
+  "model": "main.accessoryitem",
+  "pk": 2,
+  "fields": {
+    "title": "Holographic 552",
+    "slug": "holographic-552",
+    "description": "Element Holographic 552.",
+    "price": "79.90",
+    "sku": "A-15987",
+    "features": null,
+    "color": "Black",
+    "weight": "0.13",
+    "added": "2022-10-10",
+    "category": 9,
+    "image": "images/items/element-holographic-552.jpg"
+  }
+}
+]

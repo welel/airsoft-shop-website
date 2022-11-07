@@ -21,7 +21,7 @@ class Category(MPTTModel):
                             verbose_name='Category name')
     slug = models.SlugField(unique=True, max_length=200, editable=False)
     description = models.TextField(max_length=2500, null=True, blank=True)
-    image = models.ImageField(default='ProductDefault.webp')
+    image = models.ImageField(default='images/ProductDefault.png', upload_to=f'images/categories/')
     
     class MPTTMeta:
         order_insertion_by = ['name']
@@ -50,7 +50,6 @@ class Item(models.Model):
     slug = models.SlugField(max_length=200, unique=True, editable=False)
     description = models.TextField(max_length=2500, null=True, blank=True)
     price = models.DecimalField(max_digits=9, decimal_places=2)
-    image = models.ImageField(default='ProductDefault.webp')
     sku = models.CharField('Stock Keeping Unit', max_length=20, unique=True,
                            null=True, blank=True)
     features = ArrayField(models.CharField('Feature', max_length=150),
@@ -60,6 +59,7 @@ class Item(models.Model):
                                  blank=True)
     added = models.DateField('Date added', auto_now_add=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    image = models.ImageField(default='images/ProductDefault.png', upload_to=f'images/items/')
                       
     class Meta:
         abstract = True
